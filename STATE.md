@@ -29,7 +29,8 @@ source_of_truth: git   # git | harness — quem estava mais recente no último s
 - Confirmar duração do timer do redo.
 - Reescrever a nota do turno 32 em inglês (texto pronto no doc da tarefa).
 - Portfólio Breakline: aguardando "PDF de animação estilo Disney" citado pelo Tato.
-- Portfólio Shoreline: salvar v5–v9 e o clipe de 60 s na pasta `turns`.
+- Portfólio Shoreline: v5–v9 e clipe de 60 s não estão no HD; portfólio Breakline v1–v4 também não (só nos artifacts).
+- Shoreline game-turn-4.html não existe no HD.
 
 ## Placar Revelo
 Aprovadas 0 · Perdidas 1 (Shoreline) · Em redo 1 (Breakline) · Limite: 4ª reprovação = exclusão.

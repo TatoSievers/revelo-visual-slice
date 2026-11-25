@@ -1,0 +1,854 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shoreline Longing</title>
+<style>
+ html,body{margin:0;height:100%;overflow:hidden;background:#1b2433;font-family:Georgia,'Times New Roman',serif;color:#e8e0d4}
+ #gl{position:fixed;inset:0;width:100%;height:100%;display:block}
+ .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;background:radial-gradient(ellipse at 50% 65%,rgba(20,28,42,.05),rgba(10,14,22,.55));z-index:5;transition:opacity .9s}
+ .hidden{opacity:0;pointer-events:none}
+ h1{font-size:clamp(34px,6vw,64px);font-weight:400;letter-spacing:.14em;margin:0 0 10px;text-shadow:0 2px 24px rgba(0,0,0,.6)}
+ .sub{font-style:italic;opacity:.85;letter-spacing:.05em;margin:0 0 34px;font-size:clamp(14px,2vw,18px)}
+ button{font-family:inherit;font-size:16px;letter-spacing:.18em;text-transform:uppercase;color:#f3ead9;background:rgba(255,255,255,.07);border:1px solid rgba(255,235,200,.55);padding:13px 34px;border-radius:999px;cursor:pointer;backdrop-filter:blur(4px)}
+ button:hover{background:rgba(255,214,160,.18)}
+ #prompt{position:fixed;z-index:4;pointer-events:none;transform:translate(-50%,-110%);font-size:13px;letter-spacing:.16em;color:#f6ecda;background:rgba(14,18,28,.55);border:1px solid rgba(255,200,160,.45);padding:6px 14px;border-radius:999px;text-shadow:0 1px 6px #000;opacity:0;transition:opacity .35s;white-space:nowrap}
+ #prompt b{color:#ffb59d;font-weight:400}
+ #poemLine{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;z-index:4;pointer-events:none;padding:0 12vw;font-style:italic;font-size:clamp(20px,3.4vw,36px);line-height:1.5;color:#fbf3e2;text-shadow:0 2px 26px rgba(0,0,0,.85),0 0 60px rgba(255,160,110,.35);opacity:0;transition:opacity 1.1s}
+ #poem{position:fixed;left:22px;bottom:20px;z-index:4;pointer-events:none;font-style:italic;font-size:clamp(13px,1.6vw,16px);line-height:1.75;color:rgba(250,240,222,.88);text-shadow:0 1px 10px rgba(0,0,0,.9);max-width:min(480px,70vw)}
+ #poem .pline{opacity:0;transition:opacity 1.4s}
+ .endmsg h1{font-size:clamp(28px,5vw,52px)}
+ .menuBtns{display:flex;flex-direction:column;gap:12px;align-items:center}
+ .menuBtns button{min-width:260px}
+ .hint{margin-top:26px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+ .panel{background:rgba(12,16,26,.72);border:1px solid rgba(255,225,190,.25);border-radius:14px;padding:26px 30px;max-width:min(860px,92vw);backdrop-filter:blur(5px);text-align:left}
+ .cols{display:flex;gap:44px;flex-wrap:wrap}
+ .cols>div{flex:1 1 260px}
+ .panel h2{font-weight:400;letter-spacing:.16em;text-transform:uppercase;font-size:15px;color:#ffd9b8;margin:0 0 14px}
+ .panel p,.panel li{font-size:15px;line-height:1.65;margin:0 0 10px}
+ .ctl{display:flex;justify-content:space-between;gap:18px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14.5px}
+ .ctl b{font-weight:400;color:#ffe4c4;white-space:nowrap}
+ .srow{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:15px}
+ .srow button{padding:8px 18px;font-size:12px;min-width:120px}
+ .srow input[type=range]{width:170px;accent-color:#ff9d7a}
+ .backBtn{margin-top:22px}
+ #journalLines,#endingPoem{font-style:italic;font-size:17px;line-height:1.9}
+ body.reduce #vignette{display:none}
+ body.safe{font-size:19px}
+ body.safe button{font-size:19px;padding:16px 40px}
+ body.safe .panel p,body.safe .panel li,body.safe .ctl,body.safe .srow{font-size:18px}
+ body.safe #poem{font-size:19px}
+ body.safe #poemLine{font-size:clamp(26px,4.2vw,46px)}
+ body.safe #prompt{font-size:16px;padding:9px 18px}
+ body.safe #dist{font-size:15px}
+ #dist{position:fixed;top:18px;left:20px;z-index:4;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:rgba(240,232,214,.65);text-shadow:0 1px 8px #000;pointer-events:none}
+ #vignette{position:fixed;inset:0;pointer-events:none;z-index:3;background:radial-gradient(ellipse at center,transparent 55%,rgba(8,12,20,.42) 100%)}
+</style></head><body>
+<canvas id="gl"></canvas><div id="vignette"></div>
+<div id="dist"></div>
+<div id="prompt"><b>E</b> &nbsp;·&nbsp; Regard</div>
+<div id="poemLine"></div>
+<div id="poem"></div>
+<div id="introScr" class="overlay"><h1>SHORELINE LONGING</h1><p class="sub">a cold northern beach, at dusk, with no end in sight</p><p class="hint">press any key to skip</p></div>
+<div id="menuScr" class="overlay hidden"><h1>SHORELINE LONGING</h1><p class="sub">walk slowly; the sea is coming back</p><div class="menuBtns"><button id="startBtn" type="button">Start</button><button id="howtoBtn" type="button">How to play</button><button id="settingsBtn" type="button">Settings</button><button id="journalBtn" type="button">Poem Journal</button></div></div>
+<div id="howtoScr" class="overlay hidden"><div class="panel"><div class="cols"><div><h2>Controls</h2>
+<div class="ctl"><b>W / Up</b><span>walk along the shore, away</span></div>
+<div class="ctl"><b>S / Down</b><span>walk back toward you</span></div>
+<div class="ctl"><b>A / Left</b><span>toward the sea</span></div>
+<div class="ctl"><b>D / Right</b><span>toward the dunes</span></div>
+<div class="ctl"><b>Shift</b><span>hurry</span></div>
+<div class="ctl"><b>Drag mouse</b><span>look around</span></div>
+<div class="ctl"><b>E / Click</b><span>regard a found object</span></div>
+<div class="ctl"><b>Esc</b><span>pause / back</span></div></div>
+<div><h2>The walk</h2><ol>
+<li>Walk slowly to build longing, and listen to your steps.</li>
+<li>Regard what the sea left behind to gather the poem.</li>
+<li>Get your longing full before the tide comes back.</li></ol></div></div>
+<button class="backBtn" data-back type="button">Back</button></div></div>
+<div id="settingsScr" class="overlay hidden"><div class="panel"><h2>Settings</h2>
+<div class="srow"><span>Sound</span><button id="setSoundBtn" type="button">On</button></div>
+<div class="srow"><span>Music volume</span><input id="musicVol" type="range" min="0" max="100" value="80"></div>
+<div class="srow"><span>Effects volume</span><input id="fxVol" type="range" min="0" max="100" value="90"></div>
+<div class="srow"><span>Reduce effects</span><button id="reduceBtn" type="button">Off</button></div>
+<div class="srow"><span>Safe mode</span><button id="safeBtn" type="button">Off</button></div>
+<div class="srow"><span>Ending</span><button id="endingBtn" type="button">Play ending scene</button></div>
+<button class="backBtn" data-back type="button">Back</button></div></div>
+<div id="journalScr" class="overlay hidden"><div class="panel"><h2>Poem Journal</h2><div id="journalLines"></div><button class="backBtn" data-back type="button">Back</button></div></div>
+<div id="pauseScr" class="overlay hidden"><h1 style="font-size:34px">PAUSED</h1><p class="sub">the tide waits with you</p><div class="menuBtns"><button id="resumeBtn" type="button">Resume</button><button id="pauseSoundBtn" type="button">Sound: on</button><button id="restartBtn" type="button">Restart level</button><button id="pauseMenuBtn" type="button">Main menu</button></div></div>
+<div id="endingScr" class="overlay hidden"><h1 style="font-size:clamp(24px,4vw,40px)">The tide returns<br>what it borrowed.</h1><div id="endingPoem"></div><p class="sub" style="margin-top:22px">— placeholder ending —</p><button class="backBtn" data-back type="button">Back</button></div>
+<div id="win" class="overlay endmsg hidden"><h1>Level complete</h1><p class="sub">the longing was enough</p><div class="menuBtns"><button class="againBtn" type="button">Walk again</button><button class="toMenuBtn" type="button">Main menu</button></div></div>
+<div id="lose" class="overlay endmsg hidden"><h1>The tide came back</h1><p class="sub">the sea took the sand first</p><div class="menuBtns"><button class="againBtn" type="button">Walk again</button><button class="toMenuBtn" type="button">Main menu</button></div></div>
+<script>
+'use strict';
+/* Shoreline Longing - raw WebGL, no libraries, all art/audio generated in code */
+const canvas=document.getElementById('gl');
+const gl=canvas.getContext('webgl',{antialias:true,preserveDrawingBuffer:true})||canvas.getContext('experimental-webgl');
+if(!gl){document.querySelector('.sub').textContent='WebGL is not available in this browser.';throw new Error('no webgl');}
+function resize(){const d=Math.min(devicePixelRatio||1,2);canvas.width=innerWidth*d;canvas.height=innerHeight*d;gl.viewport(0,0,canvas.width,canvas.height);}
+addEventListener('resize',resize);resize();
+
+/* ---------- tiny mat4 (column-major) ---------- */
+function ident(){return new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);}
+function mul(a,b){const o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++){let s=0;for(let k=0;k<4;k++)s+=a[k*4+r]*b[c*4+k];o[c*4+r]=s;}return o;}
+function persp(fov,asp,n,f){const t=1/Math.tan(fov/2),o=new Float32Array(16);o[0]=t/asp;o[5]=t;o[10]=(f+n)/(n-f);o[11]=-1;o[14]=2*f*n/(n-f);return o;}
+function lookAt(e,t,up){let zx=e[0]-t[0],zy=e[1]-t[1],zz=e[2]-t[2];let l=Math.hypot(zx,zy,zz)||1;zx/=l;zy/=l;zz/=l;let xx=up[1]*zz-up[2]*zy,xy=up[2]*zx-up[0]*zz,xz=up[0]*zy-up[1]*zx;l=Math.hypot(xx,xy,xz)||1;xx/=l;xy/=l;xz/=l;const yx=zy*xz-zz*xy,yy=zz*xx-zx*xz,yz=zx*xy-zy*xx;const o=ident();o[0]=xx;o[1]=yx;o[2]=zx;o[4]=xy;o[5]=yy;o[6]=zy;o[8]=xz;o[9]=yz;o[10]=zz;o[12]=-(xx*e[0]+xy*e[1]+xz*e[2]);o[13]=-(yx*e[0]+yy*e[1]+yz*e[2]);o[14]=-(zx*e[0]+zy*e[1]+zz*e[2]);return o;}
+function matT(x,y,z){const o=ident();o[12]=x;o[13]=y;o[14]=z;return o;}
+function matS(x,y,z){const o=ident();o[0]=x;o[5]=y;o[10]=z;return o;}
+function matRX(a){const c=Math.cos(a),s=Math.sin(a),o=ident();o[5]=c;o[6]=s;o[9]=-s;o[10]=c;return o;}
+function matRY(a){const c=Math.cos(a),s=Math.sin(a),o=ident();o[0]=c;o[2]=-s;o[8]=s;o[10]=c;return o;}
+function matRZ(a){const c=Math.cos(a),s=Math.sin(a),o=ident();o[0]=c;o[1]=s;o[4]=-s;o[5]=c;return o;}
+function model(x,y,z,rx,ry,rz,sx,sy,sz){let m=matT(x,y,z);if(ry)m=mul(m,matRY(ry));if(rx)m=mul(m,matRX(rx));if(rz)m=mul(m,matRZ(rz));if(sx!==undefined)m=mul(m,matS(sx,sy,sz));return m;}
+function normMat(m){return new Float32Array([m[0],m[1],m[2],m[4],m[5],m[6],m[8],m[9],m[10]]);}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), lerp=(a,b,t)=>a+(b-a)*t;
+function damp(a,b,l,dt){return lerp(a,b,1-Math.exp(-l*dt));}
+function dampV(v,t,l,dt){v[0]=damp(v[0],t[0],l,dt);v[1]=damp(v[1],t[1],l,dt);v[2]=damp(v[2],t[2],l,dt);}
+function angLerp(a,b,t){let d=((b-a+Math.PI)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)-Math.PI;return a+d*t;}
+function angDamp(a,b,l,dt){return angLerp(a,b,1-Math.exp(-l*dt));}
+function hash2(x,z){let h=Math.sin(x*127.1+z*311.7)*43758.5453;return h-Math.floor(h);}
+let state='intro', prevMenu='menu', introT=0, time=0, frameDt=0.016; // early: tide/level code reads them
+const keys={};
+
+/* world shape, mirrored in GLSL */
+function shoreX(z){return 1.6*Math.sin(z*0.015)+0.9*Math.sin(z*0.043+1.7)+0.4*Math.sin(z*0.11+0.5);}
+function smooth(a,b,x){const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);}
+function groundH(x,z){const u=-x;const dune=smooth(9,38,u)*(1.4+0.8*Math.sin(z*0.06+u*0.05)+0.5*Math.sin(z*0.021-1.3));const dip=smooth(2,-16,u)*-0.9;const rip=0.035*Math.sin(u*1.4+z*0.22)*smooth(-4,4,u)*smooth(14,5,u);return dune+dip+rip-0.08;}
+/* tide + hidden longing: the level's quiet race (longing is never drawn) */
+const tide={x:-3.2,rate:0.0165}; // metres up the beach; starts seaward of the waterline
+let longing=0; const LONG_RATE={slow:0.0075,hurry:0.003,poem:0.16};
+function tideEdgeX(z){return shoreX(z)-tide.x-(Math.sin(time*0.32+z*0.018)*0.9+Math.sin(time*0.11+1.0)*0.7+tide.x*0.35);} // sea is +x; edge creeps in -x
+function updateLevel(dt){
+ if(state!=='playing'&&state!=='regard')return;
+ tide.x=Math.min(12,tide.x+tide.rate*dt);
+ if(state==='playing'&&player.speed>0.35)
+  longing=Math.min(1,longing+((keys.ShiftLeft||keys.ShiftRight)?LONG_RATE.hurry:LONG_RATE.slow)*dt*player.walkBlend);
+ if(longing>=1){endLevel(true);return;}
+ if(tideEdgeX(player.pos[2])<=player.pos[0]+0.25){endLevel(false);return;}
+}
+function endLevel(won){
+ if(state==='won'||state==='lost')return;
+ regard={f:null,t:0,phase:''};
+ document.getElementById('poemLine').style.opacity=0;
+ document.getElementById(won?'win':'lose').classList.remove('hidden');
+ setState(won?'won':'lost');
+ endSting(won);
+}
+const SUN=(()=>{const v=[0.82,0.115,0.38],l=Math.hypot(...v);return v.map(x=>x/l);})(); // over the sea (screen-left)
+const FOG=[0.74,0.57,0.48]; // warm peach haze (g well below r: never green)
+
+/* ---------- shaders ---------- */
+function shader(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))console.error(gl.getShaderInfoLog(s),src);return s;}
+function prog(vs,fs){const p=gl.createProgram();gl.attachShader(p,shader(gl.VERTEX_SHADER,vs));gl.attachShader(p,shader(gl.FRAGMENT_SHADER,fs));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))console.error(gl.getProgramInfoLog(p));const u={},n=gl.getProgramParameter(p,gl.ACTIVE_UNIFORMS);for(let i=0;i<n;i++){const inf=gl.getActiveUniform(p,i);u[inf.name]=gl.getUniformLocation(p,inf.name);}return{p,u,aPos:gl.getAttribLocation(p,'aPos'),aNor:gl.getAttribLocation(p,'aNor'),aUV:gl.getAttribLocation(p,'aUV')};}
+function makeTex(draw,w,h){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);return t;}
+function makeTextTex(text,seed){ // hand-traced writing, dark navy on clear
+ return makeTex((g,w,h)=>{g.clearRect(0,0,w,h);g.fillStyle='rgba(16,26,58,0.96)';g.strokeStyle='rgba(16,26,58,0.55)';
+  g.textAlign='center';g.textBaseline='middle';g.font='italic 600 92px Georgia,"Times New Roman",serif';
+  let rnd=seed*9301+49297;const R=()=>{rnd=(rnd*9301+49297)%233280;return rnd/233280;};
+  const words=text.split(' ');let widths=words.map(x=>g.measureText(x).width);
+  let total=widths.reduce((a,b)=>a+b,0)+26*(words.length-1);let x=(w-total)/2;
+  words.forEach((word,wi)=>{for(const ch of word){const cw=g.measureText(ch).width;
+    const jx=(R()-0.5)*5,jy=(R()-0.5)*7,rot=(R()-0.5)*0.07;
+    g.save();g.translate(x+cw/2+jx,h/2+jy);g.rotate(rot);
+    g.fillText(ch,1.5,2.5);g.globalAlpha=0.85;g.fillText(ch,0,0);g.globalAlpha=1;g.restore();x+=cw;}
+   x+=26;});
+  // a wobbly traced underline, as if drawn with a finger in wet sand
+  g.beginPath();const y0=h/2+66;g.moveTo((w-total)/2,y0);
+  for(let i=1;i<=12;i++)g.lineTo((w-total)/2+total*i/12,y0+(R()-0.5)*5);
+  g.lineWidth=4;g.stroke();},1024,256);}
+const COMMON=`
+float shoreX(float z){return 1.6*sin(z*0.015)+0.9*sin(z*0.043+1.7)+0.4*sin(z*0.11+0.5);}
+float groundH(vec2 w){float u=-w.x;float dune=smoothstep(9.0,38.0,u)*(1.4+0.8*sin(w.y*0.06+u*0.05)+0.5*sin(w.y*0.021-1.3));float dip=smoothstep(2.0,-16.0,u)*-0.9;float rip=0.035*sin(u*1.4+w.y*0.22)*smoothstep(-4.0,4.0,u)*smoothstep(14.0,5.0,u);return dune+dip+rip-0.08;}
+float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
+`;
+const skyP=prog(`
+attribute vec3 aPos;varying vec3 vDir;uniform mat4 uMVP;
+void main(){vDir=aPos;gl_Position=uMVP*vec4(aPos,1.0);}`,`
+precision mediump float;varying vec3 vDir;uniform vec3 uSun;uniform float uTime;
+void main(){vec3 d=normalize(vDir);float h=clamp(d.y,-0.05,1.0);
+// ONLY peach, coral and dusk blue. Every stop and glow is built from
+// these three; green is clamped below red everywhere, in all mixes.
+vec3 PEACH=vec3(0.99,0.74,0.54),CORAL=vec3(0.99,0.55,0.38),DUSK=vec3(0.20,0.26,0.42);
+vec3 hor=mix(PEACH,CORAL,0.35),mid=mix(CORAL,DUSK,0.62);
+vec3 col=mix(hor,mid,smoothstep(0.0,0.20,h));col=mix(col,DUSK,smoothstep(0.14,0.70,h));
+float s=max(dot(d,uSun),0.0);
+col=mix(col,PEACH,pow(s,3.0)*0.50*(1.0-smoothstep(0.0,0.35,h)));
+col=mix(col,CORAL,pow(s,12.0)*0.60);
+col=mix(col,mix(CORAL,PEACH,0.6),pow(s,120.0)*0.85);
+col=mix(col,PEACH*1.25,smoothstep(0.9993,0.9997,s));
+float cloud=sin(d.x*7.0+d.z*3.0+uTime*0.004)*sin(d.y*22.0-1.2);
+col=mix(col,mix(CORAL,DUSK,0.55),smoothstep(0.55,0.95,cloud)*0.14*smoothstep(0.02,0.22,h)*smoothstep(0.6,0.2,h));
+// hard warm clamp: in the peach/coral half of the sky green may not
+// approach red; only high dusk blue is allowed to cool, and even there
+// blue must dominate green (blue, never teal/green)
+col.g=min(col.g,mix(col.r*0.86,col.b*0.72,smoothstep(0.18,0.55,h)));
+if(d.y<0.0)col=mix(col,mix(PEACH,CORAL,0.5)*0.72,smoothstep(0.0,-0.05,d.y));
+gl_FragColor=vec4(col,1.0);}`);
+const sandP=prog(`
+attribute vec3 aPos;varying vec3 vW;uniform mat4 uMVP;uniform vec2 uCenter;
+${COMMON}
+void main(){vec2 w=aPos.xz+uCenter;float y=groundH(w);vW=vec3(w.x,y,w.y);gl_Position=uMVP*vec4(vW,1.0);}`,`
+precision highp float;varying vec3 vW;uniform float uTime;uniform vec3 uCam;uniform vec3 uSun;uniform vec3 uFog;uniform vec2 uCenter;uniform float uTide;
+${COMMON}
+void main(){float sh=shoreX(vW.z)-uTide;float dShore=sh-vW.x; // + toward dunes (-x), sea is +x
+vec2 rel=vW.xz-uCenter; // camera-relative detail: stable at any distance walked
+float camDist=length(uCam-vW);
+float fade=smoothstep(70.0,18.0,camDist); // high-frequency detail only up close
+float grain=mix(0.5,noise(rel*9.0)*0.5+noise(rel*2.3)*0.5,fade);
+grain=0.5+(grain-0.5)*(0.35+0.65*fade)+ (noise(rel*0.18)-0.5)*0.30;
+vec3 dry=mix(vec3(0.52,0.47,0.39),vec3(0.62,0.56,0.46),grain);
+vec3 wet=mix(vec3(0.34,0.31,0.27),vec3(0.42,0.37,0.31),grain);
+float wetF=smoothstep(7.0,0.6,dShore);
+float swash=sin(uTime*0.32+vW.z*0.018)*0.9+sin(uTime*0.11+1.0)*0.7+uTide*0.35;
+wetF=max(wetF,smoothstep(swash+2.6,swash,dShore)*0.9);
+vec3 col=mix(dry,wet,wetF);
+float rip=sin(rel.x*2.6+noise(rel*1.5)*2.0+rel.y*0.35);
+col*=1.0+rip*0.035*smoothstep(8.0,1.0,abs(dShore))*fade;
+col=mix(col,vec3(0.38,0.39,0.33),smoothstep(-14.0,-34.0,vW.x)*(0.35+0.4*noise(rel*0.35)));
+float peb=smoothstep(0.93,1.0,noise(rel*5.0));col=mix(col,vec3(0.30,0.30,0.31),peb*0.5*fade);
+vec3 V=normalize(uCam-vW);vec3 N=vec3(0.0,1.0,0.0);
+vec3 R=reflect(-V,N);float spec=pow(max(dot(R,uSun),0.0),60.0);
+col+=vec3(1.0,0.62,0.36)*spec*wetF*0.75;
+col+=vec3(0.55,0.58,0.66)*pow(1.0-max(dot(V,N),0.0),3.0)*wetF*0.18;
+float f=1.0-exp(-camDist*0.0045);col=mix(col,uFog,clamp(f,0.0,1.0));
+gl_FragColor=vec4(col,1.0);}`);
+const seaP=prog(`
+attribute vec3 aPos;varying vec3 vW;uniform mat4 uMVP;uniform vec2 uCenter;uniform float uTime;uniform float uTide;
+${COMMON}
+void main(){vec2 w=aPos.xz+uCenter;float y=0.02+uTide*0.028+0.045*sin(w.x*0.35+uTime*0.7)+0.035*sin(w.y*0.23-uTime*0.5)+0.02*sin((w.x+w.y)*0.6+uTime*0.9);vW=vec3(w.x,y,w.y);gl_Position=uMVP*vec4(vW,1.0);}`,`
+precision highp float;varying vec3 vW;uniform float uTime;uniform vec3 uCam;uniform vec3 uSun;uniform vec3 uFog;uniform vec2 uCenter;uniform float uTide;
+${COMMON}
+void main(){float sh=shoreX(vW.z)-uTide;float swash=sin(uTime*0.32+vW.z*0.018)*0.9+sin(uTime*0.11+1.0)*0.7+uTide*0.35;
+float edge=sh-swash;if(vW.x<edge-0.15)discard; // sea occupies x > edge (+x)
+vec2 rel=vW.xz-uCenter;
+float n=noise(rel*0.7+uTime*0.05)*0.6+noise(rel*2.6-uTime*0.08)*0.4;
+vec3 deep=vec3(0.14,0.21,0.32),nearC=vec3(0.25,0.33,0.42);
+vec3 col=mix(nearC,deep,smoothstep(-2.0,40.0,vW.x));col=mix(col,vec3(0.36,0.40,0.48),n*0.22);
+col.g=min(col.g,col.b*0.80); // dusk-blue sea: blue dominates green, never teal-green
+col=mix(col,vec3(0.80,0.58,0.45),smoothstep(60.0,380.0,vW.x)*0.80); // far sea (toward +x horizon) warms to peach
+vec3 V=normalize(uCam-vW);
+vec3 N=normalize(vec3(sin(vW.x*1.3+uTime)*0.07,1.0,sin(vW.z*1.1-uTime*0.8)*0.07));
+vec3 R=reflect(-V,N);float spec=pow(max(dot(R,uSun),0.0),90.0);
+col+=vec3(1.0,0.58,0.30)*spec*1.4;
+col+=vec3(0.8,0.55,0.38)*pow(max(dot(R,uSun),0.0),8.0)*0.18;
+float bands=sin((sh-vW.x)*1.15-uTime*0.85+sin(vW.z*0.12)*0.8);
+float foamBand=smoothstep(0.82,0.99,bands)*smoothstep(16.0,1.0,sh-vW.x)*0.35;
+float edgeFoam=smoothstep(1.15,0.0,vW.x-edge)*(0.55+0.45*noise(rel*3.0+uTime*0.15));
+float foam=clamp(foamBand+edgeFoam,0.0,1.0);
+col=mix(col,vec3(0.88,0.86,0.80),foam*0.85);
+float alpha=mix(0.72,0.96,smoothstep(0.0,9.0,vW.x-sh));alpha=max(alpha,foam);
+alpha*=smoothstep(edge-0.15,edge+0.35,vW.x);
+float dist=length(uCam-vW);float f=1.0-exp(-dist*0.0045);col=mix(col,uFog,clamp(f,0.0,1.0));
+gl_FragColor=vec4(col,alpha);}`);
+const lampP=prog(`
+attribute vec3 aPos;attribute vec3 aNor;varying vec3 vN;varying vec3 vW;uniform mat4 uMVP;uniform mat4 uModel;uniform mat3 uNorm;
+void main(){vec4 w=uModel*vec4(aPos,1.0);vW=w.xyz;vN=uNorm*aNor;gl_Position=uMVP*vec4(aPos,1.0);}`,`
+precision mediump float;varying vec3 vN;varying vec3 vW;uniform vec3 uColor;uniform float uAlpha;uniform vec3 uEmissive;uniform float uSpec;uniform vec3 uSun;uniform vec3 uCam;uniform vec3 uFog;
+void main(){vec3 N=normalize(vN);float dif=max(dot(N,uSun),0.0);
+vec3 col=uColor*(vec3(0.34,0.38,0.46)+vec3(1.05,0.62,0.38)*dif*0.95);
+col+=uColor*vec3(0.18,0.20,0.26)*max(dot(N,vec3(0.0,1.0,0.0)),0.0);
+vec3 V=normalize(uCam-vW);vec3 R=reflect(-V,N);col+=vec3(1.0,0.62,0.36)*pow(max(dot(R,uSun),0.0),48.0)*uSpec;
+col+=uEmissive;
+float dist=length(uCam-vW);float f=1.0-exp(-dist*0.0045);col=mix(col,uFog,clamp(f,0.0,1.0));
+gl_FragColor=vec4(col,uAlpha);}`);
+const texP=prog(`
+attribute vec3 aPos;attribute vec2 aUV;varying vec2 vUV;varying vec3 vW;uniform mat4 uMVP;
+void main(){vUV=aUV;vec3 p=aPos;float u=-p.x;
+float dune=smoothstep(9.0,38.0,u)*(1.4+0.8*sin(p.z*0.06+u*0.05)+0.5*sin(p.z*0.021-1.3));
+float dip=smoothstep(2.0,-16.0,u)*-0.9;
+float rip=0.035*sin(u*1.4+p.z*0.22)*smoothstep(-4.0,4.0,u)*smoothstep(14.0,5.0,u);
+p.y=dune+dip+rip-0.08+0.035;vW=p;gl_Position=uMVP*vec4(p,1.0);}`,`
+precision mediump float;varying vec2 vUV;varying vec3 vW;uniform sampler2D uTex;uniform float uAlpha;uniform float uWash;uniform float uTime;uniform vec3 uCam;uniform vec3 uFog;
+float hashq(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+void main(){vec4 tx=texture2D(uTex,vUV);
+float grain=0.75+0.25*hashq(floor(vUV*vec2(360.0,90.0))); // sandy grain in the strokes
+float a=tx.a*uAlpha*grain;
+// a small wave washes the words away: a foam front sweeps in from the sea side
+float front=uWash*1.35-0.15;
+float foam=smoothstep(0.10,0.0,abs(vUV.x-front))*step(0.001,uWash)*0.85;
+a*=smoothstep(front+0.06,front-0.10,vUV.x+ (hashq(floor(vUV*vec2(90.0,40.0)))-0.5)*0.06*uWash);
+vec3 col=mix(clamp(tx.rgb/max(tx.a,0.001),0.0,1.0),vec3(0.92,0.90,0.85),foam);
+a=max(a,foam*0.8*uAlpha);
+float dist=length(uCam-vW);float f=1.0-exp(-dist*0.0045);col=mix(col,uFog,clamp(f,0.0,1.0));
+gl_FragColor=vec4(col,a);}`);
+
+/* ---------- geometry ---------- */
+function mesh(pos,nor,idx){const pb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(pos),gl.STATIC_DRAW);let nb=null;if(nor){nb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,nb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(nor),gl.STATIC_DRAW);}const ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(idx),gl.STATIC_DRAW);return{p:pb,n:nb,i:ib,c:idx.length};}
+function grid(x0,x1,z0,z1,nx,nz){const pos=[],idx=[];for(let j=0;j<=nz;j++)for(let i=0;i<=nx;i++)pos.push(lerp(x0,x1,i/nx),0,lerp(z0,z1,j/nz));for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const a=j*(nx+1)+i,b=a+1,c=a+nx+1,d=c+1;idx.push(a,c,b,b,c,d);}return mesh(pos,null,idx);}
+function patch(cx,cz,w,d,yaw,nx,nz){ // ground patch with UVs, world-baked (shader drapes it)
+ const pos=[],uv=[],idx=[],cs=Math.cos(yaw),sn=Math.sin(yaw);
+ for(let j=0;j<=nz;j++)for(let i=0;i<=nx;i++){const u=i/nx,v=j/nz,lx=(u-0.5)*w,lz=(v-0.5)*d;
+  pos.push(cx+lx*cs-lz*sn,0,cz+lx*sn+lz*cs);uv.push(u,v);}
+ for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const a=j*(nx+1)+i,b=a+1,c=a+nx+1,dd=c+1;idx.push(a,c,b,b,c,dd);}
+ const pb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(pos),gl.STATIC_DRAW);
+ const ub=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,ub);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(uv),gl.STATIC_DRAW);
+ const ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(idx),gl.STATIC_DRAW);
+ return{p:pb,uvb:ub,i:ib,c:idx.length};}
+function sphere(r,seg,ring,sx,sy,sz){const pos=[],nor=[],idx=[];for(let j=0;j<=ring;j++){const phi=j/ring*Math.PI;for(let i=0;i<=seg;i++){const th=i/seg*Math.PI*2;const x=Math.sin(phi)*Math.cos(th),y=Math.cos(phi),z=Math.sin(phi)*Math.sin(th);pos.push(x*r*sx,y*r*sy,z*r*sz);nor.push(x/sx,y/sy,z/sz);}}for(let j=0;j<ring;j++)for(let i=0;i<seg;i++){const a=j*(seg+1)+i,b=a+1,c=a+seg+1,d=c+1;idx.push(a,c,b,b,c,d);}return mesh(pos,nor,idx);}
+function cyl(r0,r1,h,seg){const pos=[],nor=[],idx=[];for(let j=0;j<=1;j++){const y=j?h/2:-h/2,r=j?r1:r0;for(let i=0;i<=seg;i++){const t=i/seg*Math.PI*2;pos.push(Math.cos(t)*r,y,Math.sin(t)*r);nor.push(Math.cos(t),0,Math.sin(t));}}pos.push(0,h/2,0);nor.push(0,1,0);const tc=pos.length/3-1;pos.push(0,-h/2,0);nor.push(0,-1,0);const bc=pos.length/3-1;for(let i=0;i<seg;i++){const a=i,b=i+1,c=i+seg+1,d=c+1;idx.push(a,c,b,b,c,d);idx.push(tc,c,d);idx.push(bc,b,a);}return mesh(pos,nor,idx);}
+function box(w,h,d){const x=w/2,y=h/2,z=d/2;const F=[[[-x,-y,z],[x,-y,z],[x,y,z],[-x,y,z],[0,0,1]],[[-x,-y,-z],[-x,y,-z],[x,y,-z],[x,-y,-z],[0,0,-1]],[[-x,y,-z],[-x,y,z],[x,y,z],[x,y,-z],[0,1,0]],[[-x,-y,-z],[x,-y,-z],[x,-y,z],[-x,-y,z],[0,-1,0]],[[x,-y,z],[x,-y,-z],[x,y,-z],[x,y,z],[1,0,0]],[[-x,-y,z],[-x,y,z],[-x,y,-z],[-x,-y,-z],[-1,0,0]]];const pos=[],nor=[],idx=[];F.forEach((f,fi)=>{const b=fi*4;for(let i=0;i<4;i++){pos.push(...f[i]);nor.push(...f[4]);}idx.push(b,b+1,b+2,b,b+2,b+3);});return mesh(pos,nor,idx);}
+function lathe(prof,seg){const pos=[],nor=[],idx=[];for(let j=0;j<prof.length;j++){const r=prof[j][0],y=prof[j][1];for(let i=0;i<=seg;i++){const t=i/seg*Math.PI*2;pos.push(Math.cos(t)*r,y,Math.sin(t)*r);nor.push(Math.cos(t),0.35,Math.sin(t));}}for(let j=0;j<prof.length-1;j++)for(let i=0;i<seg;i++){const a=j*(seg+1)+i,b=a+1,c=a+seg+1,d=c+1;idx.push(a,c,b,b,c,d);}return mesh(pos,nor,idx);}
+function featherMesh(){const pos=[],nor=[],idx=[];const N=12;for(let j=0;j<=N;j++){const t=j/N,z=(t-0.5)*0.5,w=0.075*Math.sin(Math.PI*Math.pow(t,0.8))*(1-0.25*t)+0.004;for(let i=0;i<=4;i++){const u=i/4-0.5;pos.push(u*w*2,0.012*(1-Math.abs(u)*2)+0.03*Math.sin(t*Math.PI),z);nor.push(0,1,0);}}for(let j=0;j<N;j++)for(let i=0;i<4;i++){const a=j*5+i,b=a+1,c=a+5,d=c+1;idx.push(a,c,b,b,c,d,a,b,c,b,d,c);}return mesh(pos,nor,idx);}
+function tuftMesh(){ // one soft grass tuft: many curved blades fanning out
+ const pos=[],nor=[],idx=[];let vi=0;
+ for(let b=0;b<11;b++){const ang=b/11*Math.PI*2+hash2(b,3)*0.5, lean=0.22+hash2(b,7)*0.4, H=0.8+hash2(b,11)*0.55;
+  const dx=Math.cos(ang)*lean,dz=Math.sin(ang)*lean, w=0.016;
+  const px=-dz*w,pz=dx*w, SEG=4, base=vi;
+  for(let j=0;j<=SEG;j++){const t=j/SEG, cx=dx*t*t*0.9,cz=dz*t*t*0.9,cy=H*t*(1-0.22*t*t), ww=w*(1-t*0.75);
+   pos.push(cx-px*ww/w,cy,cz-pz*ww/w, cx+px*ww/w,cy,cz+pz*ww/w);nor.push(0,1,0,0,1,0);vi+=2;}
+  for(let j=0;j<SEG;j++){const a=base+j*2;idx.push(a,a+2,a+1,a+1,a+2,a+3,a,a+1,a+2,a+1,a+3,a+2);}}
+ return mesh(pos,nor,idx);}
+function quadMesh(){ // flat ground card, -0.5..0.5 in x/z, normal up
+ return mesh([-0.5,0,-0.5, 0.5,0,-0.5, 0.5,0,0.5, -0.5,0,0.5],[0,1,0,0,1,0,0,1,0,0,1,0],[0,2,1,0,3,2]);}
+/* ---------- sand-writing tutorial (nothing else on screen) ---------- */
+const TUT_TEXTS=['W A S D · walk','E · regard what the sea left','walk slowly · listen','Shift · hurry','skip'];
+const tutTex=TUT_TEXTS.map((t,i)=>makeTextTex(t,i+3));
+const TUT_YAW=1.85;
+function tutPlace(z,land,w,tex){const x=shoreX(z)-land;return{tex,mesh:patch(x,z,w,w/4,TUT_YAW,10,4),x,z,a:0,wash:0,shown:false};}
+function newTutorial(){return{stage:0,done:false,walked:0,slowT:0,hurryShown:false,
+ main:tutPlace(6,2.6,7.5,tutTex[0]),
+ skip:tutPlace(4.2,6.8,2.6,tutTex[4])};}
+let tut=newTutorial();
+function resetTutorial(){for(const k of['main','skip']){const o=tut[k];if(!o)continue;
+ gl.deleteBuffer(o.mesh.p);gl.deleteBuffer(o.mesh.uvb);gl.deleteBuffer(o.mesh.i);}
+ tut=newTutorial();}
+function tutSwap(tex,z,land,w){const o=tut.main;gl.deleteBuffer(o.mesh.p);gl.deleteBuffer(o.mesh.uvb);gl.deleteBuffer(o.mesh.i);
+ tut.main=tutPlace(z,land,w,tex);}
+function tutAdvance(){
+ if(tut.stage===0){tut.stage=1;const f=finds[0];tutSwap(tutTex[1],f.z-3.2,2.6,9.5);}
+ else if(tut.stage===1){tut.stage=2;tutSwap(tutTex[2],player.pos[2]+7,2.6,8.5);}
+ else if(tut.stage===2){tut.stage=3;tut.done=true;} // only the tide hint may still come
+ else if(tut.stage===4){tut.stage=5;tut.done=true;}}
+function endTutorial(){tut.done=true;tut.stage=9;
+ for(const o of[tut.main,tut.skip])if(o&&o.shown)o.wash=Math.max(o.wash,0.001);}
+function updateTutorial(dt){
+ if(state!=='playing'&&state!=='regard')return;
+ const hurryNow=!!(keys.ShiftLeft||keys.ShiftRight);
+ // stage triggers
+ if(!tut.done||tut.stage===4){
+  if(tut.stage===0){tut.walked+=player.speed*dt;if(tut.walked>5&&tut.main.wash===0)tut.main.wash=0.001;}
+  else if(tut.stage===2){if(player.speed>0.4&&player.speed<3.0&&!hurryNow)tut.slowT+=dt;if(tut.slowT>3&&tut.main.wash===0)tut.main.wash=0.001;}
+  else if(tut.stage===4){if(hurryNow&&player.speed>3.4&&tut.main.wash===0)tut.main.wash=0.001;}
+ }
+ // walking onto 'skip' clears the whole sequence
+ if(tut.stage<9&&tut.skip&&Math.hypot(player.pos[0]-tut.skip.x,player.pos[2]-tut.skip.z)<1.4&&player.speed>0.3)endTutorial();
+ // 'Shift · hurry' the first time the tide gets close (skipped players never see it)
+ if(!tut.hurryShown&&tut.stage!==9){
+  const close=(player.pos[0]-tideEdgeX(player.pos[2]))<4.2||tide.x>2.2;
+  if(close&&(tut.done||tut.stage>=3)){tut.hurryShown=true;tut.done=false;tut.stage=4;tutSwap(tutTex[3],player.pos[2]+6.5,3.4,7.0);}}
+ for(const o of[tut.main,tut.skip]){
+  if(!o)continue;
+  const isSkip=(o===tut.skip);
+  const want=(!tut.done||o.wash>0)&&(isSkip?tut.stage<3:true)&&tut.stage!==3&&tut.stage!==9;
+  o.shown=want||o.wash>0;
+  o.a=damp(o.a,want?1:0,2.2,dt);
+  if(o.wash>0&&o.wash<1){o.wash=Math.min(1,o.wash+dt/1.6);
+   if(o.wash>=1){o.wash=0;o.a=0;o.shown=false;if(!isSkip&&tut.stage!==9)tutAdvance();}}
+ }
+}
+function drawPatch(vp,o){
+ if(!o||!o.shown||o.a<0.01)return;
+ gl.useProgram(texP.p);gl.depthMask(false);
+ gl.uniformMatrix4fv(texP.u.uMVP,false,vp);
+ gl.uniform1f(texP.u.uAlpha,o.a*0.92);gl.uniform1f(texP.u.uWash,o.wash);gl.uniform1f(texP.u.uTime,time);
+ gl.uniform3fv(texP.u.uCam,camPos);gl.uniform3fv(texP.u.uFog,FOG);
+ gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,o.tex);gl.uniform1i(texP.u.uTex,0);
+ gl.bindBuffer(gl.ARRAY_BUFFER,o.mesh.p);gl.enableVertexAttribArray(texP.aPos);gl.vertexAttribPointer(texP.aPos,3,gl.FLOAT,false,0,0);
+ gl.bindBuffer(gl.ARRAY_BUFFER,o.mesh.uvb);gl.enableVertexAttribArray(texP.aUV);gl.vertexAttribPointer(texP.aUV,2,gl.FLOAT,false,0,0);
+ if(texP.aNor>=0)gl.disableVertexAttribArray(texP.aNor);
+ gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,o.mesh.i);gl.drawElements(gl.TRIANGLES,o.mesh.c,gl.UNSIGNED_SHORT,0);
+ gl.depthMask(true);}
+function drawTutorial(vp){drawPatch(vp,tut.skip);drawPatch(vp,tut.main);}
+const sandM=grid(-85,85,-130,130,90,110), seaM=grid(-16,780,-420,420,70,80), skyM=sphere(380,24,14,1,1,1);
+const M={head:sphere(0.135,18,13,0.92,1.12,0.98),hat:sphere(0.145,16,10,1,0.62,1),coat:cyl(0.235,0.155,0.78,16),thigh:cyl(0.065,0.075,0.34,9),shin:cyl(0.05,0.06,0.34,9),coatSkirt:cyl(0.285,0.225,0.34,16),arm:cyl(0.045,0.055,0.56,9),leg:cyl(0.055,0.07,0.62,9),boot:box(0.10,0.07,0.25),scarf:cyl(0.125,0.125,0.11,12),scarfTail:box(0.155,0.30,0.04),rock:sphere(1,10,7,1,0.55,0.8),drift:cyl(0.09,0.13,1.8,8),grass:cyl(0.008,0.028,0.55,5),tuft:tuftMesh(),quad:quadMesh(),post:cyl(0.07,0.08,1.15,8),shadow:sphere(0.5,16,8,1,0.05,1),
+ shell:lathe([[0.01,0],[0.09,0.008],[0.155,0.03],[0.185,0.065],[0.17,0.10],[0.12,0.125],[0.05,0.135],[0.01,0.138]],20),
+ shellIn:sphere(0.13,16,10,1,0.38,1),
+ bottle:lathe([[0.001,-0.20],[0.055,-0.20],[0.068,-0.17],[0.068,0.02],[0.045,0.10],[0.026,0.14],[0.026,0.21],[0.032,0.22],[0.032,0.24],[0.001,0.24]],18),
+ feather:featherMesh(),
+ stone:sphere(0.16,18,12,1.25,0.42,0.95)};
+gl.enable(gl.DEPTH_TEST);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+function bind(mo,pr){gl.bindBuffer(gl.ARRAY_BUFFER,mo.p);gl.enableVertexAttribArray(pr.aPos);gl.vertexAttribPointer(pr.aPos,3,gl.FLOAT,false,0,0);if(pr.aNor>=0){if(mo.n){gl.bindBuffer(gl.ARRAY_BUFFER,mo.n);gl.enableVertexAttribArray(pr.aNor);gl.vertexAttribPointer(pr.aNor,3,gl.FLOAT,false,0,0);}else gl.disableVertexAttribArray(pr.aNor);}gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,mo.i);}
+function drawMesh(vp,mdl,mo,col,alpha,emis,spec){gl.useProgram(lampP.p);gl.uniformMatrix4fv(lampP.u.uMVP,false,mul(vp,mdl));gl.uniformMatrix4fv(lampP.u.uModel,false,mdl);gl.uniformMatrix3fv(lampP.u.uNorm,false,normMat(mdl));gl.uniform3fv(lampP.u.uColor,col);gl.uniform1f(lampP.u.uAlpha,alpha===undefined?1:alpha);gl.uniform3fv(lampP.u.uEmissive,emis||[0,0,0]);gl.uniform1f(lampP.u.uSpec,spec||0);gl.uniform3fv(lampP.u.uSun,SUN);gl.uniform3fv(lampP.u.uCam,camPos);gl.uniform3fv(lampP.u.uFog,FOG);bind(mo,lampP);gl.drawElements(gl.TRIANGLES,mo.c,gl.UNSIGNED_SHORT,0);}
+
+/* ---------- walker ---------- */
+const C={coat:[0.10,0.11,0.13],coat2:[0.13,0.14,0.17],scarf:[0.92,0.38,0.30],scarfD:[0.72,0.28,0.22],scarfSeg:[[0.94,0.36,0.27],[1.00,0.55,0.35],[0.90,0.32,0.25],[1.02,0.62,0.38],[0.88,0.30,0.24],[1.00,0.50,0.33],[0.92,0.34,0.26]],skin:[0.72,0.60,0.50],hair:[0.16,0.12,0.10],leg:[0.09,0.09,0.10],boot:[0.07,0.06,0.06],rock:[0.32,0.33,0.35],drift:[0.45,0.39,0.31],grass:[0.38,0.42,0.30],shadow:[0.05,0.05,0.06],
+ shell:[0.94,0.86,0.72],shellIn:[0.97,0.78,0.68],glass:[0.35,0.62,0.55],cork:[0.62,0.48,0.30],feather:[0.92,0.91,0.86],featherTip:[0.25,0.25,0.27],stone:[0.42,0.42,0.44],glow:[1.0,0.62,0.38]};
+function drawWalker(vp){
+ const px=player.pos[0],pz=player.pos[2],gy=groundH(px,pz);
+ const spNorm=clamp(player.speed/host.hurrySpeed,0,1);
+ const ph=player.phase, swing=Math.sin(ph)*(0.16+0.30*spNorm)*player.walkBlend;
+ const bob=Math.abs(Math.cos(ph))*0.045*player.walkBlend;
+ const breathe=Math.sin(time*1.6)*0.008;
+ const K=player.kneel, A=player.alpha; if(A<0.02)return;
+ const lean=player.walkBlend*(0.04+0.10*spNorm)*(1-K)+0.34*K; // bow toward object when kneeling
+ const baseY=gy+bob-0.42*K-(player.sink||0); // kneel lowers her; soft sand sinks her boots
+ drawMesh(vp,model(px,gy+0.03,pz,0,player.yaw,0,1,1,1),M.shadow,C.shadow,0.28*A);
+ const root=model(px,baseY,pz,0,player.yaw,0);
+ const part=(mo,x,y,z,rx,ry,rz,col,alpha,sx,sy,sz)=>drawMesh(vp,mul(root,model(x,y,z,rx,ry,rz,sx||1,sy||1,sz||1)),mo,col,(alpha===undefined?1:alpha)*A);
+ // two-bone legs: straight stride when walking, folding into a kneel
+ for(const s of[-1,1]){
+  const front=(s===1), lx=0.095*s, hipY=0.78;
+  const thighA=(swing*s)*(1-K)+(front?-1.25:0.18)*K;      // front thigh forward, back thigh down
+  const shinRel=(front?1.30:1.85)*K;                        // shins fold back under
+  const hip=mul(root,model(lx,hipY,0,thighA,0,0));
+  drawMesh(vp,mul(hip,model(0,-0.17,0,0,0,0)),M.thigh,C.leg,A);
+  const knee=mul(hip,model(0,-0.34,0,shinRel,0,0));
+  drawMesh(vp,mul(knee,model(0,-0.17,0,0,0,0)),M.shin,C.leg,A);
+  const ta=thighA, sa=thighA+shinRel;
+  const fy=hipY-Math.cos(ta)*0.34-Math.cos(sa)*0.34;
+  const fz=-Math.sin(ta)*0.34-Math.sin(sa)*0.34;
+  part(M.boot,lx,fy+0.035,fz+0.04,-(ta)*0.35*(1-K)+0.3*K,0,0,C.boot);
+ }
+ // coat: skirt spreads a little as she kneels; torso leans in
+ const torso=mul(root,model(0,0.80,0,lean,0,0));
+ const tp=(mo,x,y,z,rx,ry,rz,col,sx,sy,sz)=>drawMesh(vp,mul(torso,model(x,y,z,rx,ry,rz,sx||1,sy||1,sz||1)),mo,col,A);
+ drawMesh(vp,mul(torso,mul(model(0,0.05,-0.01,0.06,0,Math.sin(ph)*0.04*player.walkBlend),matS(1+0.18*K,1,1+0.18*K))),M.coatSkirt,C.coat2,A);
+ tp(M.coat,0,0.48,0,0,0,Math.sin(ph)*0.03*player.walkBlend,C.coat);
+ // arms: swing while walking; near arm reaches down toward the object when kneeling
+ for(const s of[-1,1]){const reach=(s===-1)?-0.95:-0.35;
+  const a=(-swing*s*0.85+0.08)*(1-K)+reach*K;const shY=0.80;
+  const m1=mul(torso,model(0.205*s,shY,0,a,0,0.10*s));drawMesh(vp,mul(m1,model(0,-0.26,0,0,0,0)),M.arm,C.coat,A);
+  const hy=shY-Math.cos(a)*0.52,hz=-Math.sin(a)*0.52;tp(M.head,0.21*s,hy,hz,0,0,0,C.skin,0.32,0.32,0.32);}
+ // head bows down toward the object when kneeling
+ tp(M.head,0,1.02+breathe,0.01,0.05+0.38*K,0,0,C.skin);
+ tp(M.hat,0,1.09+breathe,-0.015,0.12+0.38*K,0,0,C.hair);
+ tp(M.scarf,0,0.90+breathe,0,0,0,0,C.scarf);
+ // scarf tail: a WIDE chain of coral stripes trailing BEHIND the walker.
+ // One clear stripe (a full-width band, alternating coral shades) is added
+ // per true find, unfurling gradually but unmistakably longer.
+ player.scarfLen=damp(player.scarfLen,scarfStripes(),2.2,Math.min(0.05,frameDt||0.016));
+ const segs=player.scarfLen, segLen=0.15;
+ const trail=0.30+spNorm*0.55+0.18*K; // streams more horizontal when hurrying / bowing
+ let segM=mul(torso,model(0.07,0.885,-0.11,0,0,0));
+ const nSeg=Math.max(1,Math.ceil(segs));
+ for(let i=0;i<nSeg;i++){
+  const frac=clamp(segs-i,0,1); if(frac<=0.01)break;
+  const bend=trail*(0.85-0.07*i)+Math.sin(time*2.3-i*0.95+ph*0.6)*(0.12+0.05*player.walkBlend);
+  const roll=Math.sin(time*1.7-i*0.65)*0.14+0.08*Math.sin(time*0.9-i);
+  segM=mul(segM,model(0,i===0?0:-segLen,0,bend,0,roll));
+  const grow=(i===nSeg-1&&segs<scarfStripes())?1.12:1; // newest stripe pulses slightly as it arrives
+  drawMesh(vp,mul(segM,model(0,-segLen*0.5,0,0,0,0,grow,segLen/0.30*frac,1.15)),M.scarfTail,C.scarfSeg[i%C.scarfSeg.length],A);
+ }
+ // short front end of the wrap, for balance
+ const flutter=Math.sin(time*2.1+ph*0.5)*0.10+0.18+spNorm*0.25;
+ drawMesh(vp,mul(torso,model(-0.05,0.86,0.10,flutter*0.6,0,-0.10,0.7,0.55,1)),M.scarfTail,C.scarfD,A);
+}
+
+/* ---------- scattered props (world-anchored, recycled along z) ---------- */
+function drawProps(vp){
+ const cell=26, zc=Math.round(player.pos[2]/cell);
+ for(let k=zc-6;k<=zc+6;k++){
+  const h=hash2(k,7.3), h2=hash2(k,19.1), h3=hash2(k,3.7);
+  const cz=k*cell+h*14-7;
+  if(h2>0.38){const rx=shoreX(cz)-tide.x+1.5+h*3;if(h2>0.5){const s=0.25+h3*0.7;drawMesh(vp,model(rx,groundH(rx,cz)+0.08*s,cz,h3*0.4,h*6.28,0,s,s,s),M.rock,C.rock);}else{drawMesh(vp,model(rx-2,groundH(rx-2,cz)+0.05,cz,Math.PI/2,h*6.28,0.2,1,1,1),M.drift,C.drift);}}
+  const dx=-16-h2*20, dz2=k*cell+h3*20-10;
+  for(let g=0;g<5;g++){const gh=hash2(k*10+g,5.5);const gx=dx+gh*3-1.5,gz=dz2+hash2(g,k)*3-1.5;drawMesh(vp,model(gx,groundH(gx,gz)+0.24,gz,(gh-0.5)*0.5+Math.sin(time*1.3+gz)*0.05,gh*6.28,(gh-0.5)*0.4),M.grass,C.grass);}
+  // the soft-sand verge: a DENSE band of tall grass TUFTS where landward
+  // walking dies away (9-16 m) — overlapping soft clumps, gently swaying
+  for(let g=0;g<26;g++){const gh=hash2(k*31+g,9.1),gh2=hash2(g*7+k,4.3),gh3=hash2(g+k*3,6.7);
+   const gz2=k*cell+(g+gh)/26*cell-cell/2;
+   const gx2=shoreX(gz2)-(8.6+gh2*7.4);
+   const sc=0.95+gh3*0.85;
+   const sway=Math.sin(time*1.1+gz2*0.55+gx2*0.3+gh*9.0)*0.06+Math.sin(time*0.53+gz2*0.2)*0.03;
+   const col=[C.grass[0]*(0.85+gh3*0.4),C.grass[1]*(0.85+gh3*0.4),C.grass[2]*(0.85+gh3*0.35)];
+   drawMesh(vp,model(gx2,groundH(gx2,gz2)-0.02,gz2,sway,gh*6.28,sway*0.6,sc,sc,sc),M.tuft,col);
+   if(g%2===0)drawMesh(vp,model(gx2-0.35,groundH(gx2-0.35,gz2+0.3)-0.02,gz2+0.3,sway*1.2,gh2*6.28,0,sc*0.7,sc*0.7,sc*0.7),M.tuft,col);}
+  if(h3>0.82){const px2=-11-h*4;drawMesh(vp,model(px2,groundH(px2,cz)+0.5,cz,0.08,h*6.28,0.12),M.post,C.drift);}
+ }
+}
+
+/* ---------- found objects & the poem ---------- */
+const POEM=["I walked here once, before the light was low.","The sea keeps every name it has ever read.","A shell still holds the hush of someone's hand.","I am not lost. I am only early."];
+const foundLines=[]; // poem lines in the order they were truly found
+function scarfStripes(){return 3+foundLines.length;} // short scarf = 3 stripes, +1 clear coral stripe per true find
+function mkFind(kind,x,z,ry,poemIdx){return{kind,x,z,y:groundH(x,z),ry,poemIdx,found:false,glow:0,spin:0};}
+const finds=[
+ mkFind('shell',  shoreX(16)-1.6, 16, 0.7, 0),
+ mkFind('bottle', shoreX(42)-2.4, 42, 2.1, 1),
+ mkFind('feather',shoreX(70)-4.2, 70, 1.2, 2),
+ mkFind('stone',  shoreX(98)-0.9, 98, 0.4, 3)
+];
+let nearFind=null, regard={f:null,t:0,phase:''};
+function emisFor(f){const e=f.glow*(0.30+0.10*Math.sin(time*3.2));return[C.glow[0]*e,C.glow[1]*e,C.glow[2]*e];}
+function drawFindBody(vp,f,base){
+ const e=emisFor(f), lift=(regard.f===f)?0.16:0, bob=(regard.f===f)?Math.sin(time*1.4)*0.012:0;
+ const root=mul(base,model(0,lift+bob,0,0,f.spin,0));
+ const P=(mo,x,y,z,rx,ry,rz,col,alpha,spec,sx,sy,sz)=>drawMesh(vp,mul(root,model(x,y,z,rx,ry,rz,sx??1,sy??1,sz??1)),mo,col,alpha,e,spec||0);
+ if(f.kind==='shell'){P(M.shell,0,0,0,0.12,0,0.04,C.shell,1,0.35);P(M.shellIn,0,0.02,0,0.12,0,0.04,C.shellIn,1,0.5);}
+ else if(f.kind==='bottle'){P(M.bottle,0,0.068,0,Math.PI/2-0.06,0,0,C.glass,0.62,0.9);P(M.scarf,0,0.075,0.235,Math.PI/2,0,0,C.cork,1,0,0.22,0.55,0.22);}
+ else if(f.kind==='feather'){P(M.feather,0,0.015,0,0,0,0.03,C.feather,1,0.08);P(M.feather,0,0.022,-0.20,0,0,0.03,C.featherTip,1,0.08,0.55,1,0.18);}
+ else{P(M.stone,0,0.045,0,0,0,0,C.stone,1,0.55);}
+}
+function drawFinds(vp){
+ for(const f of finds){
+  if(Math.abs(f.z-player.pos[2])>150)continue;
+  const base=model(f.x,f.y+0.012,f.z,0,f.ry,0);
+  drawMesh(vp,model(f.x,f.y+0.015,f.z,0,f.ry,0,0.75,1,0.75),M.shadow,C.shadow,0.22);
+  drawFindBody(vp,f,base);
+  if(f.glow>0.01){ // soft halo under/around a near (or regarded) object
+   const p=0.16*f.glow*(0.8+0.2*Math.sin(time*3.2));
+   drawMesh(vp,model(f.x,f.y+0.05,f.z,0,0,0,1.7,1,1.7),M.shadow,C.glow,p);
+   drawMesh(vp,model(f.x,f.y+0.14,f.z,0,0,0,1.0,1.6,1.0),M.shadow,C.glow,p*0.35);
+  }
+ }
+}
+function regardPos(f){return[f.x,f.y+((regard.f===f)?0.28:0.12),f.z];}
+function project(pt){ // world -> CSS px, or null when behind the camera
+ const asp=canvas.width/Math.max(1,canvas.height);
+ const m=mul(persp(0.72,asp,0.1,900),lookAt(camPos,camTarget,[0,1,0]));
+ const x=pt[0],y=pt[1],z=pt[2];
+ const cx=m[0]*x+m[4]*y+m[8]*z+m[12],cy=m[1]*x+m[5]*y+m[9]*z+m[13],cw=m[3]*x+m[7]*y+m[11]*z+m[15];
+ if(cw<=0.05)return null;
+ return[(cx/cw*0.5+0.5)*innerWidth,(0.5-cy/cw*0.5)*innerHeight];
+}
+function updateFinds(dt){
+ // EVERY unfound object earns its own prompt in turn (shell, bottle,
+ // feather, stone). Found objects keep a dim after-glow but never steal
+ // the prompt, and never block the next regard.
+ nearFind=null;let best=2.6;
+ for(const f of finds){
+  const d=Math.hypot(player.pos[0]-f.x,player.pos[2]-f.z);
+  if(regard.f===f)continue;
+  if(f.found){f.glow=damp(f.glow,d<2.6?0.35:0,4,dt);continue;}
+  f.glow=damp(f.glow,d<2.6?1:0,5,dt);
+  if(d<best){best=d;nearFind=f;}
+ }
+ const pr=document.getElementById('prompt');
+ if(state==='playing'&&nearFind&&!nearFind.found&&!regard.f){
+  const s=project([nearFind.x,nearFind.y+0.55,nearFind.z]);
+  if(s){pr.style.left=s[0]+'px';pr.style.top=s[1]+'px';pr.style.opacity=1;}else pr.style.opacity=0;
+ }else pr.style.opacity=0;
+}
+function walkerFade(){ // fade the walker out when the camera comes very close
+ const d=Math.hypot(camPos[0]-player.pos[0],camPos[2]-player.pos[2]);
+ return clamp((d-0.85)/0.9,0.12,1);}
+function startRegard(f){
+ if(!f||f.found||state!=='playing')return;
+ // a poem line still on screen must never block the next regard: clear
+ // any lingering regard/line state and start this one cleanly
+ regard={f:null,t:0,phase:''};
+ const el0=document.getElementById('poemLine');el0.style.opacity=0;el0.textContent='';
+ document.getElementById('prompt').style.opacity=0;
+ // HIGH regard: keep the walking view's iso angle, just move a little
+ // closer and centre her and the object together. No low drop, no swing
+ // to her side, so she is never cut off at the edge of the frame.
+ const gy=groundH(player.pos[0],player.pos[2]);
+ const mid=[(player.pos[0]+f.x)/2,(gy+f.y)/2+0.45,(player.pos[2]+f.z)/2];
+ const RD=9.5;
+ const camGoal=[mid[0]+Math.sin(ISO.yaw)*Math.cos(ISO.pitch)*RD,
+                mid[1]+Math.sin(ISO.pitch)*RD,
+                mid[2]+Math.cos(ISO.yaw)*Math.cos(ISO.pitch)*RD];
+ camGoal[1]=Math.max(camGoal[1],groundH(camGoal[0],camGoal[2])+0.6);
+ const lookGoal=[...mid];
+ // gentle arc: lift the midpoint so the move-in stays high and smooth
+ const sidePt=[(camPos[0]+camGoal[0])/2,Math.max(camPos[1],camGoal[1])+1.2,(camPos[2]+camGoal[2])/2];
+ regard={f,t:0,phase:'in',camGoal,lookGoal,sidePt,camFrom:[...camPos],lookFrom:[...camTarget]};
+ setState('regard');
+ player.vel[0]=player.vel[2]=0;
+ regChime();
+}
+function endRegard(){
+ const f=regard.f;
+ regard={f:null,t:0,phase:''};nearFind=null; // fully released: next prompt free
+ camYawT=ISO.yaw;camPitchT=ISO.pitch;camDist=ISO.dist;lookIdle=99; // ease straight back to the shore frame
+ const el=document.getElementById('poemLine');el.style.opacity=0;el.textContent='';
+ if(f){f.glow=0.35;f.spin=0;}
+ setState('playing');
+}
+function updateRegard(dt){
+ const f=regard.f;if(!f)return;
+ regard.t+=dt;const t=regard.t;
+ f.glow=damp(f.glow,1,4,dt);f.spin+=dt*0.55;
+ // walker comes softly to rest, turns to the object, steps in close, kneels
+ player.speed=damp(player.speed,0,8,dt);player.walkBlend=damp(player.walkBlend,0,8,dt);
+ const toFx=f.x-player.pos[0],toFz=f.z-player.pos[2],fl=Math.hypot(toFx,toFz)||1;
+ player.yaw=angDamp(player.yaw,Math.atan2(toFx,toFz),5,dt);
+ if(t<1.6&&fl>0.82){const step=Math.min(fl-0.82,dt*0.55);player.pos[0]+=toFx/fl*step;player.pos[2]+=toFz/fl*step;}
+ player.kneel=damp(player.kneel,t>0.45?1:0,2.6,dt);
+ // camera glides (slightly arched) from the walking iso shot to the
+ // closer iso shot: same high angle throughout, both subjects centred
+ const ct=smooth(0,1,clamp(t/2.4,0,1));
+ const a=regard.camFrom,b=regard.sidePt,c=regard.camGoal;
+ const px2=(1-ct)*(1-ct)*a[0]+2*(1-ct)*ct*b[0]+ct*ct*c[0];
+ const py2=(1-ct)*(1-ct)*a[1]+2*(1-ct)*ct*b[1]+ct*ct*c[1];
+ const pz2=(1-ct)*(1-ct)*a[2]+2*(1-ct)*ct*b[2]+ct*ct*c[2];
+ dampV(camPos,[px2,py2,pz2],14,dt);
+ const lt=smooth(0,1,clamp(t/2.0,0,1));
+ dampV(camTarget,[lerp(regard.lookFrom[0],regard.lookGoal[0],lt),lerp(regard.lookFrom[1],regard.lookGoal[1],lt),lerp(regard.lookFrom[2],regard.lookGoal[2],lt)],14,dt);
+ // hard guarantee: the camera never enters the walker's body volume
+ const gy2=groundH(player.pos[0],player.pos[2]);
+ let dx=camPos[0]-player.pos[0],dz=camPos[2]-player.pos[2];
+ let dd=Math.hypot(dx,dz);
+ if(dd<0.62&&camPos[1]<gy2+2.0){if(dd<0.01){dx=1;dz=0;dd=1;}camPos[0]=player.pos[0]+dx/dd*0.62;camPos[2]=player.pos[2]+dz/dd*0.62;}
+ camPos[1]=Math.max(camPos[1],groundH(camPos[0],camPos[2])+0.35);
+ player.alpha=damp(player.alpha,walkerFade(),8,dt);
+ const el=document.getElementById('poemLine');
+ if(regard.phase==='in'&&t>1.0){regard.phase='line';
+  if(!f.found){f.found=true;foundLines.push(POEM[f.poemIdx]);longing=Math.min(1,longing+LONG_RATE.poem);
+   if(tut.stage===1&&tut.main.wash===0)tut.main.wash=0.001; // did it: the wave takes the words
+   const d=document.createElement('div');d.className='pline';d.textContent=POEM[f.poemIdx];
+   document.getElementById('poem').appendChild(d);requestAnimationFrame(()=>{d.style.opacity=1;});}
+  el.textContent=POEM[f.poemIdx];el.style.opacity=1;}
+ else if(regard.phase==='line'&&t>5.0){regard.phase='out';el.style.opacity=0;}
+ else if(regard.phase==='out'&&t>6.0){endRegard();}
+ if(t>7.5)endRegard(); // safety: a regard can never wedge the next one
+}
+/* ---------- audio: generated surf, wind, footsteps ---------- */
+let AC=null,master=null,soundOn=true,surfFilter=null,surfGain=null,windFilter=null,longOsc=null,longGain=null,longOsc2=null,musicBus=null,fxBus=null;
+const SET={sound:true,music:0.8,fx:0.9,reduce:false,safe:false};
+function applySettings(){
+ soundOn=SET.sound;
+ document.body.classList.toggle('reduce',SET.reduce);
+ document.body.classList.toggle('safe',SET.safe);
+ if(SET.safe){SET.reduce=true;document.body.classList.add('reduce');tide.rate=0.011;}else tide.rate=0.0165;
+ const t=AC?AC.currentTime:0;
+ if(master)master.gain.setTargetAtTime(SET.sound&&state!=='paused'?0.9:0,t,0.05);
+ if(musicBus)musicBus.gain.setTargetAtTime(SET.music,t,0.05);
+ if(fxBus)fxBus.gain.setTargetAtTime(SET.fx,t,0.05);
+ const lbl='Sound: '+(SET.sound?'on':'off');
+ const a=document.getElementById('setSoundBtn'),b=document.getElementById('pauseSoundBtn');
+ if(a)a.textContent=SET.sound?'On':'Off'; if(b)b.textContent=lbl;
+ const r=document.getElementById('reduceBtn'),sf=document.getElementById('safeBtn');
+ if(r)r.textContent=SET.reduce?'On':'Off'; if(sf)sf.textContent=SET.safe?'On':'Off';
+}
+function initAudio(){if(AC){AC.resume();applySettings();return;}try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return;}
+ master=AC.createGain();master.gain.value=SET.sound?0.9:0;master.connect(AC.destination);
+ musicBus=AC.createGain();musicBus.gain.value=SET.music;musicBus.connect(master); // ambient surf/wind + longing bed
+ fxBus=AC.createGain();fxBus.gain.value=SET.fx;fxBus.connect(master);          // steps, chimes, stings
+ const len=AC.sampleRate*3,buf=AC.createBuffer(1,len,AC.sampleRate),d=buf.getChannelData(0);let last=0;
+ for(let i=0;i<len;i++){const w=Math.random()*2-1;last=(last+0.02*w)/1.02;d[i]=last*3.2;}
+ const surf=AC.createBufferSource();surf.buffer=buf;surf.loop=true;
+ const sf=AC.createBiquadFilter();sf.type='lowpass';sf.frequency.value=420;
+ const sg=AC.createGain();sg.gain.value=0.16;
+ const lfo=AC.createOscillator();lfo.frequency.value=0.09;const lg=AC.createGain();lg.gain.value=0.09;lfo.connect(lg);lg.connect(sg.gain);
+ const lfo2=AC.createOscillator();lfo2.frequency.value=0.045;const lg2=AC.createGain();lg2.gain.value=140;lfo2.connect(lg2);lg2.connect(sf.frequency);
+ surf.connect(sf);sf.connect(sg);sg.connect(musicBus);surf.start();lfo.start();lfo2.start();surfFilter=sf;surfGain=sg;
+ const wind=AC.createBufferSource();wind.buffer=buf;wind.loop=true;wind.playbackRate.value=0.55;
+ const wf=AC.createBiquadFilter();wf.type='bandpass';wf.frequency.value=620;wf.Q.value=0.6;
+ const wg=AC.createGain();wg.gain.value=0.045;const wl=AC.createOscillator();wl.frequency.value=0.07;const wlg=AC.createGain();wlg.gain.value=0.03;wl.connect(wlg);wlg.connect(wg.gain);
+ wind.connect(wf);wf.connect(wg);wg.connect(musicBus);wind.start();wl.start();windFilter=wf;
+ // hidden longing, heard: a warm low tonal bed that deepens as longing fills
+ longOsc=AC.createOscillator();longOsc.type='sine';longOsc.frequency.value=110;
+ longOsc2=AC.createOscillator();longOsc2.type='triangle';longOsc2.frequency.value=165;
+ longGain=AC.createGain();longGain.gain.value=0.0;
+ const lf=AC.createBiquadFilter();lf.type='lowpass';lf.frequency.value=500;
+ longOsc.connect(lf);longOsc2.connect(lf);lf.connect(longGain);longGain.connect(musicBus);
+ longOsc.start();longOsc2.start();}
+function updateLongingAudio(){ // deeper + warmer as longing fills (called each frame)
+ if(!AC)return;const L=longing,t=AC.currentTime,near=smooth(0.72,1,L);
+ if(surfFilter){surfFilter.frequency.setTargetAtTime(lerp(430,175,L),t,0.6);
+  if(surfGain)surfGain.gain.setTargetAtTime(lerp(0.17,0.30,L),t,0.6);}
+ if(windFilter)windFilter.frequency.setTargetAtTime(lerp(620,280,L),t,0.6);
+ if(longOsc){const wob=1+0.015*Math.sin(time*2.4)*near; // gentle pulse when almost full
+  longOsc.frequency.setTargetAtTime(lerp(110,55,L)*wob,t,0.4);
+  longOsc2.frequency.setTargetAtTime(lerp(165,82.5,L)*(2-wob),t,0.4);
+  longGain.gain.setTargetAtTime(lerp(0.0,0.05,smooth(0.08,0.55,L))+near*0.11,t,0.5);}}
+function endSting(won){if(!AC||!soundOn)return;const t=AC.currentTime;const notes=won?[261.6,329.6,392.0,523.3]:[196.0,164.8,130.8];
+ notes.forEach((fr,i)=>{const o=AC.createOscillator();o.type='sine';o.frequency.value=fr;const g=AC.createGain();g.gain.setValueAtTime(0.0001,t+i*0.22);g.gain.exponentialRampToValueAtTime(0.08,t+i*0.22+0.04);g.gain.exponentialRampToValueAtTime(0.0001,t+i*0.22+1.6);o.connect(g);g.connect(fxBus);o.start(t+i*0.22);o.stop(t+i*0.22+1.7);});}
+function regChime(){if(!AC||!soundOn)return;const t=AC.currentTime;[523.25,783.99].forEach((fr,i)=>{const o=AC.createOscillator();o.type='sine';o.frequency.value=fr;const g=AC.createGain();g.gain.setValueAtTime(0.0001,t+i*0.18);g.gain.exponentialRampToValueAtTime(0.07,t+i*0.18+0.03);g.gain.exponentialRampToValueAtTime(0.0001,t+i*0.18+1.4);o.connect(g);g.connect(fxBus);o.start(t+i*0.18);o.stop(t+i*0.18+1.5);});}
+function footstep(wet,vol){if(!AC||!soundOn)return;const t=AC.currentTime,L=longing;
+ const dur=lerp(0.12,0.30,L); // steps lengthen and soften as longing fills
+ const src=AC.createBufferSource();const b=AC.createBuffer(1,Math.ceil(AC.sampleRate*dur),AC.sampleRate),d=b.getChannelData(0);
+ for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+ src.buffer=b;src.playbackRate.value=lerp(1.0,0.55,L); // pitched down: deeper
+ const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=lerp(wet?900:480,wet?340:210,L);
+ const warm=AC.createBiquadFilter();warm.type='peaking';warm.frequency.value=lerp(300,150,L);warm.Q.value=0.8;warm.gain.value=lerp(0,7,L);
+ const g=AC.createGain();g.gain.setValueAtTime(vol*lerp(1,1.35,L),t);g.gain.exponentialRampToValueAtTime(0.001,t+dur);
+ src.connect(f);f.connect(warm);warm.connect(g);g.connect(fxBus);src.start();
+ if(L>0.72){const o=AC.createOscillator();o.type='sine';o.frequency.value=lerp(98,62,(L-0.72)/0.28);
+  const og=AC.createGain();og.gain.setValueAtTime(0.0001,t);og.gain.exponentialRampToValueAtTime(0.05+0.06*((L-0.72)/0.28),t+0.02);og.gain.exponentialRampToValueAtTime(0.0001,t+0.4);
+  o.connect(og);og.connect(fxBus);o.start();o.stop(t+0.45);}}
+
+/* ---------- state, input, loop ---------- */
+const ISO={yaw:Math.PI+0.72,pitch:0.72,dist:17.5};
+let lookYaw=0,lookPitch=0,lookYawT=0,lookPitchT=0; // small gentle look offsets
+let camYaw=ISO.yaw,camYawT=ISO.yaw,camPitch=ISO.pitch,camPitchT=ISO.pitch,camDist=ISO.dist,lookIdle=0,dragging=false;
+const host={walkSpeed:2.15,hurrySpeed:4.6};
+const player={pos:[shoreX(0)-3.2,0,0],vel:[0,0,0],yaw:0,speed:0,phase:0,walkBlend:0,startZ:0,lastStepSin:0,scarfLen:3,kneel:0,alpha:1,sink:0};
+let camPos=[player.pos[0]-8.8,12.5,player.pos[2]-10.0],camTarget=[player.pos[0]+1.2,0.6,player.pos[2]+1.2];
+const SCR={intro:'introScr',menu:'menuScr',howto:'howtoScr',settings:'settingsScr',journal:'journalScr',paused:'pauseScr',ending:'endingScr',won:'win',lost:'lose'};
+function setState(s){state=s;
+ for(const k in SCR)document.getElementById(SCR[k]).classList.toggle('hidden',SCR[k]!==SCR[s]);
+ if(s!=='playing')document.getElementById('prompt').style.opacity=0;
+ if(s==='journal')fillJournal(); if(s==='ending')fillEnding();
+ if(master)master.gain.value=(SET.sound&&s!=='paused')?0.9:0;}
+function fillJournal(){const el=document.getElementById('journalLines');
+ el.innerHTML=foundLines.length?foundLines.map(l=>'<div>'+l+'</div>').join(''):'<p style="font-style:normal;opacity:.75">No lines yet. Walk the shore and regard what the sea left behind.</p>';}
+function fillEnding(){const el=document.getElementById('endingPoem');
+ el.innerHTML=foundLines.length?foundLines.map(l=>'<div>'+l+'</div>').join(''):'<div>(the poem is still unwritten)</div>';}
+function goBack(){ // Esc / Back: one screen at a time
+ if(state==='howto'||state==='settings'||state==='journal')setState(prevMenu==='paused'?'paused':'menu');
+ else if(state==='ending')setState('settings');
+ else if(state==='paused')setState(regard.f?'regard':'playing');
+ else if(state==='won'||state==='lost')toMenu();}
+function toMenu(){regard={f:null,t:0,phase:''};const el=document.getElementById('poemLine');el.style.opacity=0;el.textContent='';camYawT=ISO.yaw;camPitchT=ISO.pitch;camDist=ISO.dist;setState('menu');}
+function startGame(){initAudio();applySettings();resetLevel();}
+document.getElementById('startBtn').onclick=startGame;
+document.getElementById('howtoBtn').onclick=()=>{initAudio();prevMenu='menu';setState('howto');};
+document.getElementById('settingsBtn').onclick=()=>{initAudio();prevMenu='menu';setState('settings');};
+document.getElementById('journalBtn').onclick=()=>{initAudio();prevMenu='menu';setState('journal');};
+document.querySelectorAll('[data-back]').forEach(b=>{b.onclick=()=>goBack();});
+document.querySelectorAll('.toMenuBtn').forEach(b=>{b.onclick=()=>{initAudio();toMenu();};});
+document.getElementById('setSoundBtn').onclick=()=>{initAudio();SET.sound=!SET.sound;applySettings();};
+document.getElementById('pauseSoundBtn').onclick=()=>{initAudio();SET.sound=!SET.sound;applySettings();};
+document.getElementById('musicVol').oninput=e=>{SET.music=e.target.value/100;initAudio();applySettings();};
+document.getElementById('fxVol').oninput=e=>{SET.fx=e.target.value/100;initAudio();applySettings();};
+document.getElementById('reduceBtn').onclick=()=>{SET.reduce=!SET.reduce;if(!SET.reduce)SET.safe=false;applySettings();};
+document.getElementById('safeBtn').onclick=()=>{SET.safe=!SET.safe;applySettings();};
+document.getElementById('endingBtn').onclick=()=>setState('ending');
+document.getElementById('restartBtn').onclick=()=>{initAudio();resetLevel();};
+document.getElementById('pauseMenuBtn').onclick=()=>{initAudio();toMenu();};
+function resetLevel(){ // clean restart after a win or a loss
+ tide.x=-3.2;longing=0;foundLines.length=0;
+ document.getElementById('poem').innerHTML='';document.getElementById('poemLine').style.opacity=0;resetTutorial();
+ for(const f of finds){f.found=false;f.glow=0;f.spin=0;}
+ regard={f:null,t:0,phase:''};nearFind=null;
+ player.pos=[shoreX(0)-3.2,0,0];player.vel=[0,0,0];player.yaw=0;player.speed=0;player.phase=0;player.walkBlend=0;player.scarfLen=3;player.kneel=0;player.alpha=1;player.sink=0;player.startZ=0;clearKeys();
+ camYaw=camYawT=ISO.yaw;camPitch=camPitchT=ISO.pitch;camDist=ISO.dist;
+ camPos=[player.pos[0]-8.8,12.5,player.pos[2]-10.0];camTarget=[player.pos[0]+1.2,0.6,player.pos[2]+1.2];
+ applySettings();
+ setState('playing');
+}
+document.querySelectorAll('.againBtn').forEach(b=>{b.onclick=()=>resetLevel();});
+document.getElementById('resumeBtn').onclick=()=>setState(regard.f?'regard':'playing');
+addEventListener('keydown',e=>{keys[e.code]=true;
+ if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
+ initAudio();
+ if(state==='intro'&&e.code!=='F12'){setState('menu');return;} // any key skips the intro
+ if(e.code==='Escape'){
+  if(state==='playing'||state==='regard')setState('paused'); // everything stops, tide included
+  else goBack(); return;}
+ if(e.code==='Tab'&&state==='playing'){e.preventDefault();if(tut.stage<9)endTutorial();return;}
+ if(e.code==='KeyE'&&state==='playing'&&nearFind&&!e.repeat)startRegard(nearFind);
+ if(e.code==='Enter'){
+  if(state==='menu')startGame();
+  else if(state==='won'||state==='lost')resetLevel();
+  else if(state==='howto'||state==='settings'||state==='journal'||state==='ending')goBack();}});
+addEventListener('keyup',e=>{keys[e.code]=false;
+ if(e.key==='Shift'||e.code==='ShiftLeft'||e.code==='ShiftRight'){keys.ShiftLeft=false;keys.ShiftRight=false;}});
+function clearKeys(){for(const k in keys)keys[k]=false;dragging=false;lookYawT=0;lookPitchT=0;}
+addEventListener('blur',clearKeys); // releasing Shift outside the window must not stick
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clearKeys();});
+addEventListener('contextmenu',()=>{keys.ShiftLeft=false;keys.ShiftRight=false;});
+let downX=0,downY=0,downT=0,dragMoved=false;
+addEventListener('pointerdown',()=>{initAudio();if(state==='intro')setState('menu');});
+canvas.addEventListener('pointerdown',e=>{if(state!=='playing'&&state!=='regard')return;dragging=true;dragMoved=false;downX=e.clientX;downY=e.clientY;downT=performance.now();lookIdle=0;canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener('pointermove',e=>{if(!dragging)return;if(Math.hypot(e.clientX-downX,e.clientY-downY)>6)dragMoved=true;lookIdle=0;
+ // SMALL gentle look only: low sensitivity, hard-limited offset
+ lookYawT=clamp(lookYawT-e.movementX*0.0012,-0.38,0.38);
+ lookPitchT=clamp(lookPitchT+e.movementY*0.0010,-0.18,0.20);});
+addEventListener('pointerup',e=>{ // a true left-button click (not a look-drag) regards the near object
+ if(dragging&&!dragMoved&&performance.now()-downT<450&&state==='playing'&&nearFind)startRegard(nearFind);
+ dragging=false;lookYawT=0;lookPitchT=0; // let go: the small look eases back
+});
+addEventListener('pointercancel',()=>{dragging=false;lookYawT=0;lookPitchT=0;});
+addEventListener('wheel',e=>{camDist=clamp(camDist+e.deltaY*0.012,10,28);},{passive:true});
+let touchId=null,tx=0,ty=0;
+canvas.addEventListener('touchstart',e=>{const t=e.changedTouches[0];touchId=t.identifier;tx=t.clientX;ty=t.clientY;},{passive:true});
+canvas.addEventListener('touchmove',e=>{for(const t of e.changedTouches)if(t.identifier===touchId){lookYawT=clamp(lookYawT-(t.clientX-tx)*0.002,-0.38,0.38);lookPitchT=clamp(lookPitchT+(t.clientY-ty)*0.0016,-0.18,0.20);tx=t.clientX;ty=t.clientY;lookIdle=0;}},{passive:true});
+canvas.addEventListener('touchend',()=>{lookYawT=0;lookPitchT=0;},{passive:true});
+function update(dt){
+ player.kneel=damp(player.kneel,0,3.2,dt); // stands back up after a regard
+ player.alpha=damp(player.alpha,walkerFade(),8,dt);
+ // input in camera space
+ let ix=0,iz=0;
+ // fixed ISO view: Up = along the shore (up-screen diagonal), Down = back,
+ // Left = toward the sea (screen-left), Right = toward the dunes
+ if(keys.KeyW||keys.ArrowUp)iz+=1; if(keys.KeyS||keys.ArrowDown)iz-=1;
+ if(keys.KeyA||keys.ArrowLeft)ix+=1; if(keys.KeyD||keys.ArrowRight)ix-=1;
+ const hurry=!!(keys.ShiftLeft||keys.ShiftRight);
+ const baseSp=hurry?host.hurrySpeed:host.walkSpeed;
+ // soft sand slows her ONLY while heading landward (toward dunes).
+ // Toward the sea is always full speed, so she can always walk out.
+ const landD=shoreX(player.pos[2])-player.pos[0]; // metres landward of waterline
+ const softF=smooth(7.5,13.5,landD);
+ const softSlow=Math.max(0.06,1-0.92*softF);
+ let wx=0,wz=0;const moving=(ix||iz);
+ if(moving){// shore axes under the FIXED iso angle: iz runs along the
+  // water, ix crosses sea(+x)/dunes(-x). On screen these are the two
+  // diagonals, so every key moves her the way it points on screen.
+  wx=ix;wz=iz;const l=Math.hypot(wx,wz);wx/=l;wz/=l;
+  player.yaw=angDamp(player.yaw,Math.atan2(wx,wz),10,dt);}
+ // directional soft sand: the landward (-x) component of the desired
+ // velocity is scaled by softSlow; seaward and along-shore stay full.
+ let tx2=wx*baseSp*(moving?1:0), tz2=wz*baseSp*(moving?1:0);
+ if(tx2<0)tx2*=softSlow;
+ const acc=moving?7:9;
+ player.vel[0]=damp(player.vel[0],tx2,acc,dt);
+ player.vel[2]=damp(player.vel[2],tz2,acc,dt);
+ // directional cap (also makes Shift-release instant): seaward vx may
+ // always reach baseSp; landward vx is capped by the soft sand
+ if(player.vel[0]>baseSp)player.vel[0]=baseSp;
+ if(player.vel[0]<-baseSp*softSlow)player.vel[0]=-baseSp*softSlow;
+ if(player.vel[2]>baseSp)player.vel[2]=baseSp; if(player.vel[2]<-baseSp)player.vel[2]=-baseSp;
+ player.labour=(tx2<0||player.vel[0]<-0.05)?softF:0; // sinking/labour only while pushing landward
+ player.sink=0.09*softF;
+ player.pos[0]=clamp(player.pos[0]+player.vel[0]*dt,-42,7);
+ // only the water stops her outright, at the waterline
+ const seaBound=shoreX(player.pos[2])-0.35;
+ if(player.pos[0]>seaBound)player.pos[0]=damp(player.pos[0],seaBound,9,dt);
+ player.pos[2]+=player.vel[2]*dt;
+ player.speed=Math.hypot(player.vel[0],player.vel[2])*(1-player.kneel*0.85);
+ player.walkBlend=damp(player.walkBlend,clamp(player.speed/1.2,0,1),8,dt);
+ player.phase+=dt*(3.4+player.speed*1.75)*player.walkBlend*(1-0.45*(player.labour||0)); // laboured only pushing landward
+ // footstep when a foot plants (sin crosses zero)
+ const s=Math.sin(player.phase);
+ if(player.walkBlend>0.25&&((player.lastStepSin<0&&s>=0)||(player.lastStepSin>0&&s<=0))){
+  const wet=(shoreX(player.pos[2])-tide.x)-player.pos[0]<2.5;footstep(wet,0.10+0.12*clamp(player.speed/host.hurrySpeed,0,1));}
+ player.lastStepSin=s;
+ // HIGH FIXED THREE-QUARTER (almost isometric) diorama: the angle never
+ // changes while walking; only the position follows her, smoothly. The
+ // beach runs diagonally, sea fills the left ~half, dunes the right,
+ // walker small in the middle. Dragging looks freely, then eases back.
+ lookIdle+=dt;
+ if(!dragging){lookYawT=damp(lookYawT,0,1.4,dt);lookPitchT=damp(lookPitchT,0,1.4,dt);} // eases back on release
+ lookYaw=damp(lookYaw,lookYawT,6,dt);lookPitch=damp(lookPitch,lookPitchT,6,dt);
+ camYawT=ISO.yaw+lookYaw;camPitchT=clamp(ISO.pitch+lookPitch,0.45,1.0);
+ camYaw=angDamp(camYaw,camYawT,8,dt);camPitch=damp(camPitch,camPitchT,8,dt);
+ const gy=groundH(player.pos[0],player.pos[2]);
+ const anchor=[player.pos[0],gy+0.9,player.pos[2]];
+ const desired=[anchor[0]+Math.sin(camYaw)*Math.cos(camPitch)*camDist,anchor[1]+Math.sin(camPitch)*camDist,anchor[2]+Math.cos(camYaw)*Math.cos(camPitch)*camDist];
+ desired[1]=Math.max(desired[1],groundH(desired[0],desired[2])+0.7);
+ dampV(camPos,desired,3.2,dt); // smooth follow, fixed angle
+ const lookPt=[anchor[0]+1.2,anchor[1]-0.3,anchor[2]+1.2];
+ dampV(camTarget,lookPt,6,dt);
+ document.getElementById('dist').textContent='Along the shore · '+Math.round(Math.abs(player.pos[2]-player.startZ))+' m';
+ updateFinds(dt);updateTutorial(dt);
+}
+function render(){
+ const asp=canvas.width/Math.max(1,canvas.height);
+ const view=lookAt(camPos,camTarget,[0,1,0]),proj=persp(0.72,asp,0.1,900),vp=mul(proj,view);
+ gl.clearColor(FOG[0],FOG[1],FOG[2],1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+ // sky (follows camera, no depth write)
+ gl.useProgram(skyP.p);gl.depthMask(false);gl.uniformMatrix4fv(skyP.u.uMVP,false,mul(vp,matT(camPos[0],camPos[1],camPos[2])));gl.uniform3fv(skyP.u.uSun,SUN);gl.uniform1f(skyP.u.uTime,time);bind(skyM,skyP);gl.drawElements(gl.TRIANGLES,skyM.c,gl.UNSIGNED_SHORT,0);gl.depthMask(true);
+ // snapped centre keeps detail near, world scrolls beneath
+ const cx=Math.round(player.pos[0]/8)*8,cz=Math.round(player.pos[2]/8)*8;
+ gl.useProgram(sandP.p);gl.uniformMatrix4fv(sandP.u.uMVP,false,vp);gl.uniform2f(sandP.u.uCenter,cx,cz);gl.uniform1f(sandP.u.uTide,tide.x);gl.uniform1f(sandP.u.uTime,time);gl.uniform3fv(sandP.u.uCam,camPos);gl.uniform3fv(sandP.u.uSun,SUN);gl.uniform3fv(sandP.u.uFog,FOG);bind(sandM,sandP);gl.drawElements(gl.TRIANGLES,sandM.c,gl.UNSIGNED_SHORT,0);
+ gl.useProgram(seaP.p);gl.uniformMatrix4fv(seaP.u.uMVP,false,vp);gl.uniform2f(seaP.u.uCenter,cx,cz);gl.uniform1f(seaP.u.uTide,tide.x);gl.uniform1f(seaP.u.uTime,time);gl.uniform3fv(seaP.u.uCam,camPos);gl.uniform3fv(seaP.u.uSun,SUN);gl.uniform3fv(seaP.u.uFog,FOG);bind(seaM,seaP);gl.drawElements(gl.TRIANGLES,seaM.c,gl.UNSIGNED_SHORT,0);
+ drawProps(vp);if(state==='playing'||state==='regard')drawTutorial(vp);drawFinds(vp);drawWalker(vp);
+}
+let last=performance.now();
+function frame(now){requestAnimationFrame(frame);let dt=Math.min(0.05,(now-last)/1000);last=now;frameDt=dt;
+ const R=SET.reduce?0.35:1; // Reduce effects: calmer world/camera drift
+ if(state==='paused'){render();return;} // everything stops: tide, music, time
+ if(state==='playing'){time+=dt;update(dt);updateLevel(dt);updateLongingAudio();}
+ else if(state==='regard'){time+=dt;updateRegard(dt);updateLevel(dt);updateTutorial(dt);updateLongingAudio();}
+ else if(state==='won'||state==='lost'){time+=dt*0.25*R;player.walkBlend=damp(player.walkBlend,0,3,dt);player.speed=damp(player.speed,0,3,dt);}
+ else if(state==='intro'){introT+=dt;time+=dt*(0.5*R+0.15);
+  if(introT>11){setState('menu');}
+  else{ // slow camera move over the beach, beneath the title
+   const gy=groundH(player.pos[0],player.pos[2]);const a=[player.pos[0],gy+1.1,player.pos[2]];
+   const k=smooth(0,1,introT/11);
+   const yaw=lerp(Math.PI+1.3,ISO.yaw,k), dist=lerp(30,ISO.dist,k);
+   const d=[a[0]+Math.sin(yaw)*Math.cos(ISO.pitch)*dist,a[1]+Math.sin(ISO.pitch)*dist,a[2]+Math.cos(yaw)*Math.cos(ISO.pitch)*dist];
+   const look=[a[0]+1.2,a[1]-0.3,a[2]+1.2];
+   dampV(camPos,d,1.6,dt);dampV(camTarget,look,2.2,dt);camYawT=yaw;camYaw=yaw;camPitchT=ISO.pitch;camPitch=ISO.pitch;}}
+ else if(state==='menu'||state==='howto'||state==='settings'||state==='journal'||state==='ending'){time+=dt*0.30*R;
+  // quiet ambient drift behind the menus; game world does not advance
+  const gy=groundH(player.pos[0],player.pos[2]);const a=[player.pos[0],gy+1.1,player.pos[2]];
+  const yaw=ISO.yaw+Math.sin(time*0.05)*0.10*R;
+  const d=[a[0]+Math.sin(yaw)*Math.cos(ISO.pitch)*ISO.dist,a[1]+Math.sin(ISO.pitch)*ISO.dist,a[2]+Math.cos(yaw)*Math.cos(ISO.pitch)*ISO.dist];
+  const look=[a[0]+1.2,a[1]-0.3,a[2]+1.2];
+  dampV(camPos,d,1.8,dt);dampV(camTarget,look,3,dt);}
+ render();}
+setState('intro');
+requestAnimationFrame(frame);
+</script></body></html>
