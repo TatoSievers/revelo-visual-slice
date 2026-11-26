@@ -21,7 +21,7 @@ Intro encenada · final do amanhecer · cones visíveis bloqueados pelos contêi
 | 4 | Melhor nota mistura estrelas de tentativas diferentes | O | R3, R3b | ok (26/11) |
 | 5 | C (agachar) não faz nada; ensinar na 1ª cobertura baixa | O | R7 | — |
 | 6 | Dicas encadeadas (SHIFT trava as outras) | O | R4 | ok (26/11; fila de 2 dicas não testada) |
-| 7 | Reaction shot nunca explicado; HUD sem aviso | O | R6 | — |
+| 7 | Reaction shot nunca explicado; HUD sem aviso | ok | R6b | game-turn-43 |
 | 8 | Intro: soldado azul agachado sem pernas | O | R8 | — |
 | 9 | Lanterna: falta feixe da lente até o cone no chão | O | R17 | — |
 | 10 | Vazio preto além dos muros; set dressing; soldados com mais detalhe | O | R15, R16 | — |
@@ -87,6 +87,9 @@ Reaction shots need a warning and an explanation. During my turn, when the activ
 **R7 · Agachar (C)** — anexar REF_Soldier_Crouch.png
 Add crouch on C, as the controls promise ("C — crouch to use low cover"). C toggles crouch for the active soldier: he lowers into a crouch with both legs clearly visible and bent, knees forward and feet flat on the ground, never sinking into the floor, like the attached reference, and moves at half speed while crouched. Use the reference only for the pose. Add a few low cover pieces to the yard, waist-high crate stacks and concrete barriers about half a soldier's height, including one on the path from the start to the terminal. A crouched soldier behind low cover is not seen by a flashlight; a standing soldier behind low cover is still seen. Tall cover works as it does now. The first time the soldier gets near low cover, show a hint in the same style as the others: "C  Crouch behind low cover". Keep everything else as it is. Then list 5 things I should test.
 
+**R7b · Dica FIRE no padrão**
+The FIRE hint ("Each shot costs stamina") does not behave like the others: it appears and disappears almost instantly. Make it work like the rest. Show it the first time the active soldier has a guard in range and can shoot, before the shot, not after. It stays for about 6 seconds, or until the player fires, whichever comes first, then fades and never comes back in that run. Keep every other hint as it is. Then list 5 things I should test.
+
 **R8 · Pose agachada na intro**
 In the intro's close shot of the crouched squad, the blue soldier has no visible legs and reads as a floating torso. Use exactly the same crouch pose the soldiers now use in play, with both legs visible and bent, for both soldiers in that shot. Keep the shot, its timing and the camera as they are. Then list 5 things I should test.
 
@@ -141,6 +144,8 @@ Turn 32 raised the guards' damage, because losing took far too long: soldiers so
 | 7 | R5 slot do prompt | ok (dica acima do prompt, COVER 2 linhas cresce p/ cima) | letreiro BREACH ficava SEALED após upload (→R5b) | game-turn-40 | 14.08.21 (26/11) |
 | 8 | R5b letreiro da brecha | ok: SEALED antes, OPEN após upload, volta SEALED no Restart, console limpo | Results (teste 3) e cena final (teste 5) não verificados | game-turn-41 | 14.16.45 (26/11) |
 | 9 | R6 aviso de reaction shot | FALHOU: 10 prints sem aviso vermelho, cone segue bege, sem dica | nada visível perto da borda do cone (→R6b) | game-turn-42 | 14.51.32 (26/11) |
+| 10 | R6b aviso mais visível | ok: aviso vermelho a ~1,5 m, cone vermelho pulsando, banner REACTION SHOT 1,5 s, dica REACTION na 1ª vez | cobertura/fumaça sem aviso e música de perigo não vistas (checar na regressão) | game-turn-43 | 15.05.22 (26/11) |
+| 11 | R7 agachar (C) + cobertura baixa | ok no visível: dica C, 4 coberturas baixas, barreira na rota | dica FIRE some rápido demais (→R7b); pose agachada de perfil não vista | game-turn-44 | 15.32.24 (26/11) |
 
 ---
 # HISTÓRICO DA 1ª ENTREGA
