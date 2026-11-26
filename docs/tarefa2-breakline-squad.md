@@ -5,7 +5,7 @@
 - **Prazo: 24 horas úteis (sem fim de semana) para INICIAR o redo.** Depois disso = abandonada, sem pagamento. O Tato retoma no fim do dia 25/11 ou na manhã de 26/11.
 - Pagamento: tempo do original + redo, limitado ao máximo original. Se não refizer, o original também não é pago.
 - Base do redo: `build33`. **Entregar arquivo NOVO** (redo com o mesmo arquivo = reprovação automática).
-- Timer do redo: A CONFIRMAR quando o Tato abrir.
+- Timer do redo: **5h29m, aberto ~10:00 de 26/11 → termina ~15:29. Congelar até ~14:30.**
 - **Referências: as 5 PRONTAS (25/11 14:54).** 4 geradas no GPT pelo Tato + mapa da fase 2 feito pelo Claude.
 
 ## REDO — o que o revisor pediu (19 itens)
@@ -15,8 +15,8 @@ Intro encenada · final do amanhecer · cones visíveis bloqueados pelos contêi
 ### Checklist (Obrigatório = O · Sugestão = S)
 | # | Item | Tipo | Prompt | Status |
 |---|------|------|--------|--------|
-| 1 | A/D invertidos (strafe) | O | R1 | — |
-| 2 | E e G sem custo de stamina; mostrar custo na barra | O | R2 | — |
+| 1 | A/D invertidos (strafe) | O | R1 | ok (26/11) |
+| 2 | E e G sem custo de stamina; mostrar custo na barra | O | R2, R2b | ok (26/11; G-stamina re-testar quando alguém estiver ferido) |
 | 3 | Só 1 fase: precisa de fase 2 + seleção de fases com melhor nota + último nível toca o final | O | R9, R10 | — |
 | 4 | Melhor nota mistura estrelas de tentativas diferentes | O | R3 | — |
 | 5 | C (agachar) não faz nada; ensinar na 1ª cobertura baixa | O | R7 | — |
@@ -49,6 +49,8 @@ Entram também no zip de "worked from" da entrega.
 Core loop primeiro (R1–R10), porque a fase 2 e o seletor mudam a estrutura e a arte depois precisa cobrir as duas fases. Arte e UI depois (R11–R17). Sugestões por último (R18). Se faltar tempo, corta só S (16, 18); nunca O.
 
 ### Decisões do redo
+- 26/11: R2b adicionou aviso vermelho acima do soldado nas recusas por stamina (G 20, E 15, tiro 25). Recusas por vida cheia/sem medkit só tremem o slot: aceito, não vale outro turno.
+- 26/11: modelo por prompt — Sonnet em R1–R6, R8, R11–R17; Opus em R7, R9, R10 e na revisão final (limite semanal 73% usado, reset seg 30/11 8h).
 - 25/11: a regra "uma fase só" (reunião de 23/11) foi o motivo do item 3. O revisor cobra os passos 7–8 do GDD. **Seguir o revisor.**
 - 25/11: fase 2 = "NORTH QUAY" (layout no mapa): início SE, terminal num anel de contêineres com aberturas N e S, brecha no muro oeste, 3 guardas, fileira de caixas baixas entre o guarda do corredor e a rota. Fase 1 = "CONTAINER YARD".
 - 25/11: hints viram independentes ANTES de adicionar o agachamento, para a dica do C já nascer no sistema novo.
@@ -126,6 +128,9 @@ Turn 32 raised the guards' damage, because losing took far too long: soldiers so
 ## Redo turn log
 | # | Pedido | Resultado | Problemas vistos | Build | Print |
 |---|--------|-----------|------------------|-------|-------|
+| 1 | R1 strafe A/D | ok (A/D, setas, diagonais) | hint SHIFT preso no turno 3 (→R4) | redo-t1 | 10.10.56 (26/11) |
+| 2 | R2 custo E/G | parcial: custo e prévia ok, recusa sem aviso | sem mensagem acima do soldado | redo-t2 | 10.25.32 (26/11) |
+| 3 | R2b aviso de recusa | ok em E (15) e tiro (25); G (20) só validado em código | G sem medkit/vida cheia só treme o slot (aceito) | redo-t3 | 10.40.20 (26/11) |
 
 ---
 # HISTÓRICO DA 1ª ENTREGA

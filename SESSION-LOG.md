@@ -9,3 +9,4 @@ Uma linha por salvamento: `data -03:00 · LLM/harness · o que foi feito`.
 - 2026-11-25 · Claude · Feedback de redo (19 itens) → checklist, fila R1–R18, 5 referências; kit de abertura.
 - 2026-11-25T15:00 · Claude Opus 5.5 · Repositório Git criado; protocolo de sync multi-LLM.
 - 2026-11-25T15:20 · Claude Opus 5.5 · Builds das tarefas 1 e 2 + portfólio Shoreline v1–v4 copiados do HD; primeiro push.
+- 2026-11-26T10:45 · Claude Sonnet 5.5 · Redo turnos 1–3 (R1, R2, R2b) ok; timer 5h29m.
