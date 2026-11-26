@@ -34,6 +34,8 @@ Intro encenada · final do amanhecer · cones visíveis bloqueados pelos contêi
 | 17 | R8d pose agachada no jogo | PARCIAL: pose parada ok (joelho de trás perto do chão, tronco inclinado, sem cadeira) | movimento agachado reprovado: parece arrastar (→R8e) | game-turn-49; print 16.54.46 |
 | 18 | R8e caminhada com trajetória de pé (IK) | REPROVADO: as duas pernas se movem juntas, passo grande (74 cm, pé sobe 17 cm), não parece natural (→R8f com valores do portfólio) | | game-turn-50; print 17.09.14 |
 | 19 | R8f marcha do portfólio sobre a pose assimétrica | REPROVADO: sobre a pose de joelho no chão o passo de ±4° é imperceptível e parece arrastar com um joelho no chão (→R8g: pose de marcha simétrica em movimento, parada mantém a pose da intro) | ciclo do agente 1,83 s (portfólio 1,46 s): usar 2,62 rad/m | game-turn-51; print 17.27.38 |
+| 20 | R8g pose de marcha simétrica ao andar agachado | ok: andando, os dois pés no chão e joelhos dobrados; parado volta à pose da intro | sem vista lateral (câmera atrás), aceito | game-turn-52; print 17.36.18 |
+| 21 | R9 fase 2 NORTH QUAY (Opus) | PARCIAL: layout, 3 guardas, anel, brecha oeste, fluxo L1→L2→final e estrelas por fase ok | som em mute volta ao trocar de fase (→R9b); banner diz "NW BREACH" na L2 e Results da L1 diz "BRKL YARD" (→R9c) | game-turn-53; print 17.58.56 |
 
 **Valores do portfólio (breakline-portfolio-v4.html, poseRig) para a marcha agachada**
 - Fase 2,15 rad/m, pernas 180° defasadas; agachado a 2,0 m/s dá ciclo de 1,46 s.
