@@ -11,3 +11,5 @@ Uma linha por salvamento: `data -03:00 · LLM/harness · o que foi feito`.
 - 2026-11-25T15:20 · Claude Opus 5.5 · Builds das tarefas 1 e 2 + portfólio Shoreline v1–v4 copiados do HD; primeiro push.
 - 2026-11-26T10:45 · Claude Sonnet 5.5 · Redo turnos 1–3 (R1, R2, R2b) ok; timer 5h29m.
 - 2026-11-26T14:10 · Claude Sonnet 5.5 · Redo turnos 4–6 (R3, R3b, R4) ok; R5 reescrito, R5b criado.
+
+- 2026-11-26T17:35 · Claude Sonnet 5.5 · Redo turnos 15–19: R8c ok; R8d pose ok; R8e/R8f reprovados no andar agachado; valores do portfólio no doc; timer 4h03m.

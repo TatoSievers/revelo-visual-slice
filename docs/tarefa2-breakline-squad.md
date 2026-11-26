@@ -22,7 +22,7 @@ Intro encenada · final do amanhecer · cones visíveis bloqueados pelos contêi
 | 5 | C (agachar) não faz nada; ensinar na 1ª cobertura baixa | ok | R7 | game-turn-43 (pose só visível na intro: câmera é travada atrás do soldado) |
 | 6 | Dicas encadeadas (SHIFT trava as outras) | O | R4 | ok (26/11; fila de 2 dicas não testada) |
 | 7 | Reaction shot nunca explicado; HUD sem aviso | ok | R6b | game-turn-42 |
-| 8 | Intro: soldado azul agachado sem pernas | O | R8 | — |
+| 8 | Intro: soldado azul agachado sem pernas | ok | R8b, R8c | game-turn-48 |
 | 9 | Lanterna: falta feixe da lente até o cone no chão | O | R17 | — |
 | 10 | Vazio preto além dos muros; set dressing; soldados com mais detalhe | O | R15, R16 | — |
 | 11 | Pausa sem Sound on/off direto | O | R11 | — |
@@ -31,6 +31,15 @@ Intro encenada · final do amanhecer · cones visíveis bloqueados pelos contêi
 | 14 | Logo sem design → logo desenhado em código (rachadura/brecha) | O | R13 | — |
 | 15 | How to Play colado à esquerda → centralizar | O | R12 | — |
 | 16 | Vitória corta direto para Results → "MISSION COMPLETE" | S | R18 | — |
+| 17 | R8d pose agachada no jogo | PARCIAL: pose parada ok (joelho de trás perto do chão, tronco inclinado, sem cadeira) | movimento agachado reprovado: parece arrastar (→R8e) | game-turn-49; print 16.54.46 |
+| 18 | R8e caminhada com trajetória de pé (IK) | REPROVADO: as duas pernas se movem juntas, passo grande (74 cm, pé sobe 17 cm), não parece natural (→R8f com valores do portfólio) | | game-turn-50; print 17.09.14 |
+| 19 | R8f marcha do portfólio sobre a pose assimétrica | REPROVADO: sobre a pose de joelho no chão o passo de ±4° é imperceptível e parece arrastar com um joelho no chão (→R8g: pose de marcha simétrica em movimento, parada mantém a pose da intro) | ciclo do agente 1,83 s (portfólio 1,46 s): usar 2,62 rad/m | game-turn-51; print 17.27.38 |
+
+**Valores do portfólio (breakline-portfolio-v4.html, poseRig) para a marcha agachada**
+- Fase 2,15 rad/m, pernas 180° defasadas; agachado a 2,0 m/s dá ciclo de 1,46 s.
+- Pose em movimento (simétrica): coxas -1,15 rad (66°) à frente, joelhos 1,9 rad (109°), quadril a 62% da altura em pé, tronco 0,38 rad (22°).
+- Marcha: coxa ±4,3°, joelho +1 a +9° na perna que avança, quadril sem sobe-e-desce, balanço lateral 2 cm, giro do quadril ±5°, giro do tronco ∓6°, rolagem 1°, esmagamento 2,5% no apoio, braços 2° no dobro da frequência.
+- Lição: a pose parada assimétrica (joelho de trás no chão) NÃO anda; para andar, usar a pose simétrica e mesclar com a parada ao começar/parar.
 | 17 | Settings da pausa oferece "Play ending scene" → só no menu principal | S | R11 | — |
 | 18 | Mostrar outros pátios além dos muros | S | corte | — |
 | 19 | Nota do turno 32 em português → tudo em inglês | O | entrega | — |
@@ -162,6 +171,7 @@ Turn 32 raised the guards' damage, because losing took far too long: soldiers so
 | 13 | R7c IN COVER | ok: rótulo + contorno turquesa na cobertura baixa só quando agachado e protegido; sem rótulo exposto/em pé (16.12.33, 16.13.04) | hit-chance ("-70%") sobrepôs a dica REACTION em janela pequena (16.11.55); mouse controla a mira | game-turn-45 | 16.11.45 (26/11) |
 | 14 | R8 pose na intro | REPROVADO pelo Tato: cena escura, só 1 soldado visível, parece sentado | câmera traseira esconde pernas; Moss escondido atrás do container (→R8b) | game-turn-46 | 16.22.56 (26/11) |
 | 15 | R8b intro legível | PARCIAL: intro ok (2 soldados lado a lado, pernas e joelhos visíveis) | luz de contorno estoura parede/piso em ciano (→R8c); no jogo a pose agachada parece sentado (→R8d) | game-turn-47 | 16.41.28 (26/11) |
+| 16 | R8c luz da intro | ok: parede e piso escuros, sem ciano estourado, soldados legíveis com bordas turquesa | brilho suave na parede ao fundo durante o drift (16.47.50), aceito; pose no jogo ainda parece sentado (→R8d) | game-turn-48 | 16.47.52 (26/11) |
 
 ---
 # HISTÓRICO DA 1ª ENTREGA
