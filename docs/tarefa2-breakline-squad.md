@@ -36,6 +36,9 @@ Intro encenada · final do amanhecer · cones visíveis bloqueados pelos contêi
 | 19 | R8f marcha do portfólio sobre a pose assimétrica | REPROVADO: sobre a pose de joelho no chão o passo de ±4° é imperceptível e parece arrastar com um joelho no chão (→R8g: pose de marcha simétrica em movimento, parada mantém a pose da intro) | ciclo do agente 1,83 s (portfólio 1,46 s): usar 2,62 rad/m | game-turn-51; print 17.27.38 |
 | 20 | R8g pose de marcha simétrica ao andar agachado | ok: andando, os dois pés no chão e joelhos dobrados; parado volta à pose da intro | sem vista lateral (câmera atrás), aceito | game-turn-52; print 17.36.18 |
 | 21 | R9 fase 2 NORTH QUAY (Opus) | PARCIAL: layout, 3 guardas, anel, brecha oeste, fluxo L1→L2→final e estrelas por fase ok | som em mute volta ao trocar de fase (→R9b); banner diz "NW BREACH" na L2 e Results da L1 diz "BRKL YARD" (→R9c) | game-turn-53; print 17.58.56 |
+| 22 | R9b mute entre fases | ok: som desligado se mantém em troca de fase, Retry, menu, final e recarga; liga/desliga nos dois sentidos | | game-turn-54; print 18.15.37 |
+| 23 | R9c textos (WEST BREACH na L2, CONTAINER YARD na L1) | ok | modo dev já existia: #dev + tecla 0 completa o upload; sem #dev nada acontece | game-turn-55; print 18.20.48 |
+| 24 | R9e início da L2 longe do guarda da faixa | ok: sem aviso parado no início; aviso só ao se aproximar; agachado atrás dos caixotes fica IN COVER | em pé na faixa leva 2 tiros em 2 turnos (100→25), aceito como dificuldade | game-turn-56; print 18.29.31 |
 
 **Valores do portfólio (breakline-portfolio-v4.html, poseRig) para a marcha agachada**
 - Fase 2,15 rad/m, pernas 180° defasadas; agachado a 2,0 m/s dá ciclo de 1,46 s.

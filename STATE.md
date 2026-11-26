@@ -3,7 +3,7 @@
 > Atualize este arquivo em todo salvamento (ver AGENTS.md §2). O `updated_at` é o que decide se o Git ou o harness está mais recente.
 
 ```yaml
-updated_at: 2026-11-26T18:05-03:00
+updated_at: 2026-11-26T18:33-03:00
 updated_by: Claude Sonnet 5.5 (claude.ai Project "revelo - Visual Slice")
 source_of_truth: git   # git | harness — quem estava mais recente no último sync
 ```
@@ -16,10 +16,10 @@ source_of_truth: git   # git | harness — quem estava mais recente no último s
 - Timer do redo: **5h29m no início; só corre com o agente (5h19m às 10:44; 4h32m às 15:12; 4h41m às 15:37 e 15:45; 4h33m às 16:13; 4h18m às 16:42; 4h15m às 16:49; 4h12m às 16:57; 4h10m às 17:09; 4h03m às 17:31 de 26/11; a leitura 4h32m das 15:12 provavelmente estava errada). Congelar com ~55 min de timer sobrando.
 
 ## Onde parou
-- Redo EM ANDAMENTO (26/11). Turnos 1–19: R1–R8c ok (game-turn-34..48); R8d pose parada ok (49); R8e (50) e R8f (51) reprovados no andar agachado; R8g ok (52); R9 fase 2 parcial (53); faltam R9b (som) e R9c (textos).
+- Redo EM ANDAMENTO (26/11). Turnos 1–19: R1–R8c ok (game-turn-34..48); R8d pose parada ok (49); R8e (50) e R8f (51) reprovados no andar agachado; R8g ok (52); R9 fase 2 (53), R9b som (54), R9c textos (55), R9e início L2 (56) ok; próximo R10 (57). Timer 3h33m às 18:31.
 
 ## Próximo passo
-- R9b, R9c e R10 com Opus; depois Sonnet do R11 ao R17. Próximo commit no turno 24.
+- R10 com Opus; depois Sonnet do R11 ao R17. Próximo commit no turno 27. Modo dev: #dev + tecla 0.
 - Re-testar G com stamina <20 quando um soldado estiver ferido.
 - Timer: perguntar ao Tato a cada turno (último informado: 4h32m às 15:12 de 26/11, após o turno 10).
 
