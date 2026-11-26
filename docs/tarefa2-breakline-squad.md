@@ -19,9 +19,9 @@ Intro encenada · final do amanhecer · cones visíveis bloqueados pelos contêi
 | 2 | E e G sem custo de stamina; mostrar custo na barra | O | R2, R2b | ok (26/11; G-stamina re-testar quando alguém estiver ferido) |
 | 3 | Só 1 fase: precisa de fase 2 + seleção de fases com melhor nota + último nível toca o final | O | R9, R10 | — |
 | 4 | Melhor nota mistura estrelas de tentativas diferentes | O | R3, R3b | ok (26/11) |
-| 5 | C (agachar) não faz nada; ensinar na 1ª cobertura baixa | ok | R7 | game-turn-44 (pose só visível na intro: câmera é travada atrás do soldado) |
+| 5 | C (agachar) não faz nada; ensinar na 1ª cobertura baixa | ok | R7 | game-turn-43 (pose só visível na intro: câmera é travada atrás do soldado) |
 | 6 | Dicas encadeadas (SHIFT trava as outras) | O | R4 | ok (26/11; fila de 2 dicas não testada) |
-| 7 | Reaction shot nunca explicado; HUD sem aviso | ok | R6b | game-turn-43 |
+| 7 | Reaction shot nunca explicado; HUD sem aviso | ok | R6b | game-turn-42 |
 | 8 | Intro: soldado azul agachado sem pernas | O | R8 | — |
 | 9 | Lanterna: falta feixe da lente até o cone no chão | O | R17 | — |
 | 10 | Vazio preto além dos muros; set dressing; soldados com mais detalhe | O | R15, R16 | — |
@@ -93,6 +93,15 @@ The FIRE hint ("Each shot costs stamina") does not behave like the others: it ap
 **R7c · Feedback de cobertura baixa** (decidido no turno 12)
 When the active soldier is crouched behind low cover and a guard's flashlight cannot see him because of it, show a short label in the safe teal over that cover piece: "IN COVER", and give the piece a thin teal outline. The moment he stands up or steps out of the cover's protection, the label and the outline disappear. Nothing shows for tall cover. Keep everything else as it is. Then list 5 things I should test.
 
+**R8b · Intro legível (anexar REF_Soldier_Crouch.png + 02_Character_Reference_Revised.png)** (decidido no turno 14)
+The close shot of the crouched squad in the intro still does not work: it is too dark, only one soldier reads, and he looks like he is sitting. Attached are the crouch pose reference (use it for the pose only) and the character sheet for Vega (blue, tall, helmet with a stripe) and Moss (green, short and stocky, beanie, radio). Change this one shot so both soldiers are clearly visible side by side from a three-quarter side angle, with their legs in view. Add a soft cool teal rim light from behind and a gentle fill so both silhouettes stand out against the dark yard without losing the night mood. Both are in the same deep crouch as the reference: knees bent and forward, one knee near the ground, feet flat, torso leaning forward as if hiding behind cover, not sitting. Keep the shot's timing and the subtitle lines as they are. You may change the camera angle and framing of this one shot. Keep everything else as it is. Then list 5 things I should test.
+
+**R8c · Luz da intro (decidido no turno 15)**
+In the intro close shot of the two crouched soldiers, the rim light is far too strong: it washes the wall and the floor in bright cyan and the floor looks blown out. Reduce it so the wall and floor stay dark night blue and only thin teal edges glow on the helmets, shoulders and knees. Keep a gentle fill so faces, vests and legs still read. Keep the staging, the pose, the timing and the subtitles as they are. Then list 5 things I should test.
+
+**R8d · Pose agachada no jogo (decidido no turno 15)**
+In play, the crouched soldiers look like they are sitting on a chair: thighs flat, back straight. Use the same crouch pose as the intro close shot for the C crouch in play: front foot flat ahead with the knee high and forward, rear knee close to the ground with the foot planted behind, torso leaning forward over the rifle. Walking while crouched keeps that bent-leg look at half speed. Keep everything else as it is. Then list 5 things I should test.
+
 **R8 · Pose agachada na intro**
 In the intro's close shot of the crouched squad, the blue soldier has no visible legs and reads as a floating torso. Use exactly the same crouch pose the soldiers now use in play, with both legs visible and bent, for both soldiers in that shot. Keep the shot, its timing and the camera as they are. Then list 5 things I should test.
 
@@ -146,10 +155,13 @@ Turn 32 raised the guards' damage, because losing took far too long: soldiers so
 | 6 | R4 dicas independentes | ok: WASD, TAB, ENTER, SHIFT, COVER, E aparecem sozinhas; nenhuma no turno inimigo | fila de 2 dicas não vista | game-turn-39 | 14.00.38 (26/11) |
 | 7 | R5 slot do prompt | ok (dica acima do prompt, COVER 2 linhas cresce p/ cima) | letreiro BREACH ficava SEALED após upload (→R5b) | game-turn-40 | 14.08.21 (26/11) |
 | 8 | R5b letreiro da brecha | ok: SEALED antes, OPEN após upload, volta SEALED no Restart, console limpo | Results (teste 3) e cena final (teste 5) não verificados | game-turn-41 | 14.16.45 (26/11) |
-| 9 | R6 aviso de reaction shot | FALHOU: 10 prints sem aviso vermelho, cone segue bege, sem dica | nada visível perto da borda do cone (→R6b) | game-turn-42 | 14.51.32 (26/11) |
-| 10 | R6b aviso mais visível | ok: aviso vermelho a ~1,5 m, cone vermelho pulsando, banner REACTION SHOT 1,5 s, dica REACTION na 1ª vez | cobertura/fumaça sem aviso e música de perigo não vistas (checar na regressão) | game-turn-43 | 15.05.22 (26/11) |
-| 11 | R7 agachar (C) + cobertura baixa | ok no visível: dica C, 4 coberturas baixas, barreira na rota | dica FIRE some rápido demais (→R7b); pose agachada de perfil não vista | game-turn-44 | 15.32.24 (26/11) |
-| 12 | R7b dica FIRE no padrão | ok: C e FIRE em fila (15.46.01 → 15.46.06), FIRE antes do 1º tiro, tiros funcionam (Vega 0/4, Sentry caído) | FIRE apareceu com containers entre Vega e guardas; duração de ~6 s e retry não medidos | game-turn-45 | 15.46.06 (26/11) |
+| 9 | R6 aviso de reaction shot | FALHOU: 10 prints sem aviso vermelho, cone segue bege, sem dica | nada visível perto da borda do cone (→R6b) | (não salva) | 14.51.32 (26/11) |
+| 10 | R6b aviso mais visível | ok: aviso vermelho a ~1,5 m, cone vermelho pulsando, banner REACTION SHOT 1,5 s, dica REACTION na 1ª vez | cobertura/fumaça sem aviso e música de perigo não vistas (checar na regressão) | game-turn-42 | 15.05.22 (26/11) |
+| 11 | R7 agachar (C) + cobertura baixa | ok no visível: dica C, 4 coberturas baixas, barreira na rota | dica FIRE some rápido demais (→R7b); pose agachada de perfil não vista | game-turn-43 | 15.32.24 (26/11) |
+| 12 | R7b dica FIRE no padrão | ok: C e FIRE em fila (15.46.01 → 15.46.06), FIRE antes do 1º tiro, tiros funcionam (Vega 0/4, Sentry caído) | FIRE apareceu com containers entre Vega e guardas; duração de ~6 s e retry não medidos | game-turn-44 | 15.46.06 (26/11) |
+| 13 | R7c IN COVER | ok: rótulo + contorno turquesa na cobertura baixa só quando agachado e protegido; sem rótulo exposto/em pé (16.12.33, 16.13.04) | hit-chance ("-70%") sobrepôs a dica REACTION em janela pequena (16.11.55); mouse controla a mira | game-turn-45 | 16.11.45 (26/11) |
+| 14 | R8 pose na intro | REPROVADO pelo Tato: cena escura, só 1 soldado visível, parece sentado | câmera traseira esconde pernas; Moss escondido atrás do container (→R8b) | game-turn-46 | 16.22.56 (26/11) |
+| 15 | R8b intro legível | PARCIAL: intro ok (2 soldados lado a lado, pernas e joelhos visíveis) | luz de contorno estoura parede/piso em ciano (→R8c); no jogo a pose agachada parece sentado (→R8d) | game-turn-47 | 16.41.28 (26/11) |
 
 ---
 # HISTÓRICO DA 1ª ENTREGA
