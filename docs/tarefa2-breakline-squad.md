@@ -5,7 +5,7 @@
 - **Prazo: 24 horas úteis (sem fim de semana) para INICIAR o redo.** Depois disso = abandonada, sem pagamento. O Tato retoma no fim do dia 25/11 ou na manhã de 26/11.
 - Pagamento: tempo do original + redo, limitado ao máximo original. Se não refizer, o original também não é pago.
 - Base do redo: `build33`. **Entregar arquivo NOVO** (redo com o mesmo arquivo = reprovação automática).
-- Timer do redo: **5h29m, aberto ~10:00 de 26/11 → termina ~15:29. Congelar até ~14:30.**
+- Timer do redo: **5h29m no início; timer só corre com o agente (5h19m às 10:44 de 26/11). Contar pelo timer, não pelo relógio.**
 - **Referências: as 5 PRONTAS (25/11 14:54).** 4 geradas no GPT pelo Tato + mapa da fase 2 feito pelo Claude.
 
 ## REDO — o que o revisor pediu (19 itens)
@@ -18,9 +18,9 @@ Intro encenada · final do amanhecer · cones visíveis bloqueados pelos contêi
 | 1 | A/D invertidos (strafe) | O | R1 | ok (26/11) |
 | 2 | E e G sem custo de stamina; mostrar custo na barra | O | R2, R2b | ok (26/11; G-stamina re-testar quando alguém estiver ferido) |
 | 3 | Só 1 fase: precisa de fase 2 + seleção de fases com melhor nota + último nível toca o final | O | R9, R10 | — |
-| 4 | Melhor nota mistura estrelas de tentativas diferentes | O | R3 | — |
+| 4 | Melhor nota mistura estrelas de tentativas diferentes | O | R3, R3b | ok (26/11) |
 | 5 | C (agachar) não faz nada; ensinar na 1ª cobertura baixa | O | R7 | — |
-| 6 | Dicas encadeadas (SHIFT trava as outras) | O | R4 | — |
+| 6 | Dicas encadeadas (SHIFT trava as outras) | O | R4 | ok (26/11; fila de 2 dicas não testada) |
 | 7 | Reaction shot nunca explicado; HUD sem aviso | O | R6 | — |
 | 8 | Intro: soldado azul agachado sem pernas | O | R8 | — |
 | 9 | Lanterna: falta feixe da lente até o cone no chão | O | R17 | — |
@@ -49,6 +49,7 @@ Entram também no zip de "worked from" da entrega.
 Core loop primeiro (R1–R10), porque a fase 2 e o seletor mudam a estrutura e a arte depois precisa cobrir as duas fases. Arte e UI depois (R11–R17). Sugestões por último (R18). Se faltar tempo, corta só S (16, 18); nunca O.
 
 ### Decisões do redo
+- 26/11: R4 ganhou "só uma dica por vez" (evita TAB e movimento juntos no turno 1). R5 NÃO esconde a dica quando há prompt (isso mataria a dica do E e ela reapareceria depois do upload): prompt fica sempre abaixo da dica. R5b novo: letreiro "BREACH — SEALED" continua depois do upload.
 - 26/11: R2b adicionou aviso vermelho acima do soldado nas recusas por stamina (G 20, E 15, tiro 25). Recusas por vida cheia/sem medkit só tremem o slot: aceito, não vale outro turno.
 - 26/11: modelo por prompt — Sonnet em R1–R6, R8, R11–R17; Opus em R7, R9, R10 e na revisão final (limite semanal 73% usado, reset seg 30/11 8h).
 - 25/11: a regra "uma fase só" (reunião de 23/11) foi o motivo do item 3. O revisor cobra os passos 7–8 do GDD. **Seguir o revisor.**
@@ -75,7 +76,10 @@ The best rating for a level must be the best single attempt, never stars combine
 Tutorial hints are chained right now: the next hint only appears after the current one is done, so if I never hold Shift, "SHIFT Hurry" stays on screen for the whole level, even in the enemy turn, and the COVER, TAB, ENTER and E hints never appear. Make every hint independent and show it the moment the player first needs it: the movement hint at the start as now; SHIFT after the soldier first walks a few meters; COVER the first time he gets close to a container near a flashlight cone; TAB at the start of the first turn where the second soldier hasn't moved yet; ENTER when the active soldier's stamina first drops below half; E when a soldier first gets close to the terminal. Each hint stays for about 6 seconds or until the player does that action, whichever comes first, then fades and never comes back. No hints during the enemy turn. Keep everything else as it is. Then list 5 things I should test.
 
 **R5 · Prompt de interação com posição própria**
-The tutorial hint and the interaction prompt share the same spot and cover each other: at the terminal "SHIFT Hurry" sits on top of "PRESS E — RUN UPLOAD AT TERMINAL", and after the upload on top of "UPLOAD COMPLETE — HEAD TO THE NW BREACH". Give interaction prompts and objective messages their own fixed position in the lower middle of the screen, clear of the other HUD elements, and keep hints where they are. While a prompt is on screen, hide any hint. Keep everything else as it is. Then list 5 things I should test.
+The tutorial hint and the interaction prompt can cover each other, especially in smaller windows: at the terminal "SHIFT Hurry" sits on top of "PRESS E — RUN UPLOAD AT TERMINAL", and after the upload on top of "UPLOAD COMPLETE — HEAD TO THE NW BREACH". Give interaction prompts and objective messages their own fixed position in the lower middle of the screen, always below the hint with a clear gap, so the two never overlap at any window size, including 1280×720 and 1920×1080. If a hint wraps to two lines it grows upward, never down into the prompt. Keep the hints where they are. Keep everything else as it is. Then list 5 things I should test.
+
+**R5b · Letreiro da brecha**
+After the upload the breach barrier is down, but the label above the breach in the world still reads "BREACH — SEALED", even on the Results screen. When the upload completes, change that label to "BREACH — OPEN". Before the upload it stays "BREACH — SEALED". Keep everything else as it is. Then list 5 things I should test.
 
 **R6 · Aviso de reaction shot**
 Reaction shots need a warning and an explanation. During my turn, when the active soldier is about to step into a guard's flashlight cone (within about one meter of its edge), show a short warning in the alert red: "REACTION SHOT — YOU WILL BE SEEN", and make that cone's edge pulse red. When a reaction shot actually fires, the turn banner changes to "REACTION SHOT" for about 1.5 seconds, then goes back to the normal banner. The first time it happens in a run, show a one-time hint in the same style as the other hints: "Stepping into a flashlight draws an instant reaction shot. Stay in the dark or behind cover." Keep the damage and everything else as it is. Then list 5 things I should test.
@@ -131,6 +135,9 @@ Turn 32 raised the guards' damage, because losing took far too long: soldiers so
 | 1 | R1 strafe A/D | ok (A/D, setas, diagonais) | hint SHIFT preso no turno 3 (→R4) | redo-t1 | 10.10.56 (26/11) |
 | 2 | R2 custo E/G | parcial: custo e prévia ok, recusa sem aviso | sem mensagem acima do soldado | redo-t2 | 10.25.32 (26/11) |
 | 3 | R2b aviso de recusa | ok em E (15) e tiro (25); G (20) só validado em código | G sem medkit/vida cheia só treme o slot (aceito) | redo-t3 | 10.40.20 (26/11) |
+| 4 | R3 melhor nota | parcial: regra ok, não persistia ao recarregar | reload zerava | redo-t4 | 10.47.16 (26/11) |
+| 5 | R3b persistência | ok (1★→3★ substitui; 2★/1★ não rebaixam) | — | redo-t5 | 13.43.29 (26/11) |
+| 6 | R4 dicas independentes | ok: WASD, TAB, ENTER, SHIFT, COVER, E aparecem sozinhas; nenhuma no turno inimigo | fila de 2 dicas não vista | redo-t6 | 14.00.38 (26/11) |
 
 ---
 # HISTÓRICO DA 1ª ENTREGA

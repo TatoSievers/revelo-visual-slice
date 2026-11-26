@@ -3,7 +3,7 @@
 > Atualize este arquivo em todo salvamento (ver AGENTS.md §2). O `updated_at` é o que decide se o Git ou o harness está mais recente.
 
 ```yaml
-updated_at: 2026-11-26T10:45-03:00
+updated_at: 2026-11-26T14:10-03:00
 updated_by: Claude Sonnet 5.5 (claude.ai Project "revelo - Visual Slice")
 source_of_truth: git   # git | harness — quem estava mais recente no último sync
 ```
@@ -13,14 +13,15 @@ source_of_truth: git   # git | harness — quem estava mais recente no último s
 - Task IDs: 35e58678-ebc7-40df-9644-35496d5d1307 (e-mail de redo) · 8367298f-870d-410f-b7ab-0535e755eab8 (envio original)
 - Doc: `docs/tarefa2-breakline-squad.md`
 - Prazo: 24 horas úteis a partir de 25/11 para **INICIAR** o redo. Tato retoma no fim do dia 25/11 ou manhã de 26/11.
-- Timer do redo: **5h29m**, aberto ~10:00 de 26/11 → termina ~15:29. Congelar até ~14:30.
+- Timer do redo: **5h29m no início; o timer só corre com o agente (5h19m às 10:44 de 26/11). Contar SÓ pelo timer, não pelo relógio. Congelar com ~55 min de timer sobrando.
 
 ## Onde parou
-- Redo EM ANDAMENTO (26/11). Turnos 1–3 feitos: R1 (strafe) ok, R2+R2b (custo/aviso de stamina em E, G, tiro) ok. Base build33; arquivo do agente em /work/workspace/index.html (entregar com nome NOVO).
+- Redo EM ANDAMENTO (26/11). Turnos 1–6 feitos: R1, R2+R2b, R3+R3b, R4 ok. Base build33; arquivo do agente em /work/workspace/index.html (entregar com nome NOVO).
 
 ## Próximo passo
-- R3 (melhor nota = melhor tentativa), depois R4, R5, R6 (Sonnet). **Trocar para Opus antes do R7.**
+- R5 (prompt abaixo da dica), R5b (letreiro BREACH — OPEN), R6 (aviso de reaction shot) com Sonnet. **Trocar para Opus antes do R7.**
 - Re-testar G com stamina <20 quando um soldado estiver ferido.
+- Timer: perguntar ao Tato a cada turno (último informado: 5h19m às 10:44).
 
 ## Bloqueios / pendências
 - Confirmar duração do timer do redo.
