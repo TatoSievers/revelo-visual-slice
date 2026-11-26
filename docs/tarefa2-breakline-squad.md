@@ -26,7 +26,7 @@ Intro encenada · final do amanhecer · cones visíveis bloqueados pelos contêi
 | 9 | Lanterna: falta feixe da lente até o cone no chão | O | R17 | — |
 | 10 | Vazio preto além dos muros; set dressing; soldados com mais detalhe | O | R15, R16 | — |
 | 11 | Pausa sem Sound on/off direto | O | R11 | — |
-| 12 | Dica e prompt de interação se sobrepõem | O | R5 | — |
+| 12 | Dica e prompt de interação se sobrepõem | ok | R5 | game-turn-40 |
 | 13 | Fontes do sistema → letreiro próprio desenhado em código | O | R14 | — |
 | 14 | Logo sem design → logo desenhado em código (rachadura/brecha) | O | R13 | — |
 | 15 | How to Play colado à esquerda → centralizar | O | R12 | — |
@@ -132,12 +132,15 @@ Turn 32 raised the guards' damage, because losing took far too long: soldiers so
 ## Redo turn log
 | # | Pedido | Resultado | Problemas vistos | Build | Print |
 |---|--------|-----------|------------------|-------|-------|
-| 1 | R1 strafe A/D | ok (A/D, setas, diagonais) | hint SHIFT preso no turno 3 (→R4) | redo-t1 | 10.10.56 (26/11) |
-| 2 | R2 custo E/G | parcial: custo e prévia ok, recusa sem aviso | sem mensagem acima do soldado | redo-t2 | 10.25.32 (26/11) |
-| 3 | R2b aviso de recusa | ok em E (15) e tiro (25); G (20) só validado em código | G sem medkit/vida cheia só treme o slot (aceito) | redo-t3 | 10.40.20 (26/11) |
-| 4 | R3 melhor nota | parcial: regra ok, não persistia ao recarregar | reload zerava | redo-t4 | 10.47.16 (26/11) |
-| 5 | R3b persistência | ok (1★→3★ substitui; 2★/1★ não rebaixam) | — | redo-t5 | 13.43.29 (26/11) |
-| 6 | R4 dicas independentes | ok: WASD, TAB, ENTER, SHIFT, COVER, E aparecem sozinhas; nenhuma no turno inimigo | fila de 2 dicas não vista | redo-t6 | 14.00.38 (26/11) |
+| 1 | R1 strafe A/D | ok (A/D, setas, diagonais) | hint SHIFT preso no turno 3 (→R4) | game-turn-34 | 10.10.56 (26/11) |
+| 2 | R2 custo E/G | parcial: custo e prévia ok, recusa sem aviso | sem mensagem acima do soldado | game-turn-35 | 10.25.32 (26/11) |
+| 3 | R2b aviso de recusa | ok em E (15) e tiro (25); G (20) só validado em código | G sem medkit/vida cheia só treme o slot (aceito) | game-turn-36 | 10.40.20 (26/11) |
+| 4 | R3 melhor nota | parcial: regra ok, não persistia ao recarregar | reload zerava | game-turn-37 | 10.47.16 (26/11) |
+| 5 | R3b persistência | ok (1★→3★ substitui; 2★/1★ não rebaixam) | — | game-turn-38 | 13.43.29 (26/11) |
+| 6 | R4 dicas independentes | ok: WASD, TAB, ENTER, SHIFT, COVER, E aparecem sozinhas; nenhuma no turno inimigo | fila de 2 dicas não vista | game-turn-39 | 14.00.38 (26/11) |
+| 7 | R5 slot do prompt | ok (dica acima do prompt, COVER 2 linhas cresce p/ cima) | letreiro BREACH ficava SEALED após upload (→R5b) | game-turn-40 | 14.08.21 (26/11) |
+| 8 | R5b letreiro da brecha | ok: SEALED antes, OPEN após upload, volta SEALED no Restart, console limpo | Results (teste 3) e cena final (teste 5) não verificados | game-turn-41 | 14.16.45 (26/11) |
+| 9 | R6 aviso de reaction shot | FALHOU: 10 prints sem aviso vermelho, cone segue bege, sem dica | nada visível perto da borda do cone (→R6b) | game-turn-42 | 14.51.32 (26/11) |
 
 ---
 # HISTÓRICO DA 1ª ENTREGA
@@ -236,3 +239,7 @@ Mini-jogo tático por turnos; o jogador controla diretamente um membro do esquad
 - O agente inventa tagline: pedir "no tagline / no subtitle".
 - IA adiada demais. Balanceamento testado tarde. Congelamento reaberto 3x.
 - **Lições do feedback (25/11):** (1) "uma fase só" contrariou os passos 7–8 do GDD e virou item de reprovação; (2) todo controle listado no GDD precisa funcionar (C não fazia nada); (3) toda ação que o GDD diz gastar stamina precisa gastar (E, G); (4) dicas não podem ser encadeadas; (5) fonte do sistema e logo de texto puro são cobrados; (6) a pausa precisa ter Sound direto; (7) as notas são lidas: tudo em inglês.
+
+
+## Sugestão opcional (após R18)
+- Texto "HEAD TO THE NW BREACH" não tem bússola no jogo; trocar para "HEAD TO THE NW BREACH — FOLLOW THE TEAL BEAM".
