@@ -19,7 +19,7 @@ Intro encenada · final do amanhecer · cones visíveis bloqueados pelos contêi
 | 2 | E e G sem custo de stamina; mostrar custo na barra | O | R2, R2b | ok (26/11; G-stamina re-testar quando alguém estiver ferido) |
 | 3 | Só 1 fase: precisa de fase 2 + seleção de fases com melhor nota + último nível toca o final | O | R9, R10 | — |
 | 4 | Melhor nota mistura estrelas de tentativas diferentes | O | R3, R3b | ok (26/11) |
-| 5 | C (agachar) não faz nada; ensinar na 1ª cobertura baixa | O | R7 | — |
+| 5 | C (agachar) não faz nada; ensinar na 1ª cobertura baixa | ok | R7 | game-turn-44 (pose só visível na intro: câmera é travada atrás do soldado) |
 | 6 | Dicas encadeadas (SHIFT trava as outras) | O | R4 | ok (26/11; fila de 2 dicas não testada) |
 | 7 | Reaction shot nunca explicado; HUD sem aviso | ok | R6b | game-turn-43 |
 | 8 | Intro: soldado azul agachado sem pernas | O | R8 | — |
@@ -90,6 +90,9 @@ Add crouch on C, as the controls promise ("C — crouch to use low cover"). C to
 **R7b · Dica FIRE no padrão**
 The FIRE hint ("Each shot costs stamina") does not behave like the others: it appears and disappears almost instantly. Make it work like the rest. Show it the first time the active soldier has a guard in range and can shoot, before the shot, not after. It stays for about 6 seconds, or until the player fires, whichever comes first, then fades and never comes back in that run. Keep every other hint as it is. Then list 5 things I should test.
 
+**R7c · Feedback de cobertura baixa** (decidido no turno 12)
+When the active soldier is crouched behind low cover and a guard's flashlight cannot see him because of it, show a short label in the safe teal over that cover piece: "IN COVER", and give the piece a thin teal outline. The moment he stands up or steps out of the cover's protection, the label and the outline disappear. Nothing shows for tall cover. Keep everything else as it is. Then list 5 things I should test.
+
 **R8 · Pose agachada na intro**
 In the intro's close shot of the crouched squad, the blue soldier has no visible legs and reads as a floating torso. Use exactly the same crouch pose the soldiers now use in play, with both legs visible and bent, for both soldiers in that shot. Keep the shot, its timing and the camera as they are. Then list 5 things I should test.
 
@@ -146,6 +149,7 @@ Turn 32 raised the guards' damage, because losing took far too long: soldiers so
 | 9 | R6 aviso de reaction shot | FALHOU: 10 prints sem aviso vermelho, cone segue bege, sem dica | nada visível perto da borda do cone (→R6b) | game-turn-42 | 14.51.32 (26/11) |
 | 10 | R6b aviso mais visível | ok: aviso vermelho a ~1,5 m, cone vermelho pulsando, banner REACTION SHOT 1,5 s, dica REACTION na 1ª vez | cobertura/fumaça sem aviso e música de perigo não vistas (checar na regressão) | game-turn-43 | 15.05.22 (26/11) |
 | 11 | R7 agachar (C) + cobertura baixa | ok no visível: dica C, 4 coberturas baixas, barreira na rota | dica FIRE some rápido demais (→R7b); pose agachada de perfil não vista | game-turn-44 | 15.32.24 (26/11) |
+| 12 | R7b dica FIRE no padrão | ok: C e FIRE em fila (15.46.01 → 15.46.06), FIRE antes do 1º tiro, tiros funcionam (Vega 0/4, Sentry caído) | FIRE apareceu com containers entre Vega e guardas; duração de ~6 s e retry não medidos | game-turn-45 | 15.46.06 (26/11) |
 
 ---
 # HISTÓRICO DA 1ª ENTREGA
